@@ -1,0 +1,62 @@
+import { email, event } from '../__mocks__'
+import { parseEventBody, postItem } from '../../../src/handlers/post-item'
+import status from '../../../src/util/status'
+
+const mockAddToQueue = jest.fn()
+const mockFormatEmail = jest.fn()
+const mockIsValidEmail = jest.fn()
+jest.mock('@services/sqs', () => ({
+  addToQueue: (email) => mockAddToQueue(email),
+  formatEmail: (email) => mockFormatEmail(email),
+  isValidEmail: (email) => mockIsValidEmail(email),
+}))
+
+describe('post-item', () => {
+  describe('parseEventBody', () => {
+    test.each([true, false])(
+      'expect bodies to be base64 decoded, when necessary (isBase64Encoded=%s)',
+      async (isBase64Encoded: boolean) => {
+        const expectedResult = { motto: 'veni vidi vici' }
+        const tempEvent = {
+          ...event,
+          isBase64Encoded,
+          body: isBase64Encoded
+            ? Buffer.from(JSON.stringify(expectedResult)).toString('base64')
+            : JSON.stringify(expectedResult),
+        }
+
+        const result = await parseEventBody(tempEvent)
+        expect(result).toEqual(expectedResult)
+      }
+    )
+  })
+
+  describe('postItem', () => {
+    beforeAll(() => {
+      mockAddToQueue.mockResolvedValue(undefined)
+      mockFormatEmail.mockResolvedValue(email)
+      mockIsValidEmail.mockReturnValue(true)
+    })
+
+    test('expect NO_CONTENT when everything is valid', async () => {
+      const result = await postItem(event)
+      expect(result).toEqual(expect.objectContaining(status.NO_CONTENT))
+    })
+
+    test('expect NOT_FOUND when invalid method', async () => {
+      const result = await postItem({ ...event, httpMethod: 'GET' })
+      expect(result).toEqual(expect.objectContaining(status.NOT_FOUND))
+    })
+
+    test('expect BAD_REQUEST when invalid email', async () => {
+      mockIsValidEmail.mockReturnValue(false)
+      const result = await postItem({ ...event, body: JSON.stringify({ to: 'e@mail.address' }) })
+      expect(result).toEqual(expect.objectContaining(status.BAD_REQUEST))
+    })
+
+    test('expect INTERNAL_SERVER_ERROR when invalid email JSON', async () => {
+      const result = await postItem({ ...event, body: 'fnord' })
+      expect(result).toEqual(expect.objectContaining(status.INTERNAL_SERVER_ERROR))
+    })
+  })
+})
