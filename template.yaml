@@ -21,6 +21,9 @@ Resources:
       StageName: v1
       Auth:
         ApiKeyRequired: true # sets for all methods
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Description: Usage plan for emails-queue-api
       Domain:
         DomainName: emails-queue-api.bowland.link
         CertificateArn: arn:aws:acm:us-east-1:494887012091:certificate/7f4606f7-302c-40a8-ac9d-e63db9b7a712
