@@ -1,4 +1,4 @@
-import { handleErrorWithDefault } from '@src/util/error-handling'
+import { handleErrorWithDefault } from '../util/error-handling'
 import { APIGatewayEvent } from 'aws-lambda'
 
 import { addToQueue, formatEmail, isValidEmail, Email } from '../services/sqs'
