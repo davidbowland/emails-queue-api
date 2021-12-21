@@ -43,10 +43,10 @@ export const isValidEmail = (email: Email): boolean =>
 
 /* Message queue */
 
-export const addToQueue = (email: Email) =>
+export const addToQueue = (data: { [key: string]: string }) =>
   sqs
     .sendMessage({
-      MessageBody: JSON.stringify({ email }),
+      MessageBody: JSON.stringify(data),
       QueueUrl: sqsQueueUrl,
     })
     .promise()

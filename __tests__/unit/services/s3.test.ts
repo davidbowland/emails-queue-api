@@ -1,7 +1,9 @@
 import { S3 } from 'aws-sdk'
 
+import { messageBuffer, uuid } from '../__mocks__'
 import { emailBucket } from '../../../src/config'
-import { putS3Object } from '../../../src/services/s3'
+import * as s3Module from '../../../src/services/s3'
+import { putS3Object, uploadContentsToS3 } from '../../../src/services/s3'
 
 const mockPutObject = jest.fn()
 jest.mock('aws-sdk', () => ({
@@ -16,6 +18,19 @@ jest.mock('../../../src/util/error-handling', () => ({
 
 describe('S3', () => {
   const key = 'prefix/key'
+
+  describe('uploadContentsToS3', () => {
+    const mockPutS3Object = jest.spyOn(s3Module, 'putS3Object')
+
+    beforeEach(() => {
+      mockPutS3Object.mockResolvedValueOnce({})
+    })
+
+    test('expect uuid and body to be passed to putS3Object', async () => {
+      await uploadContentsToS3(uuid, messageBuffer)
+      expect(mockPutS3Object).toHaveBeenCalledWith(`queue/${uuid}`, messageBuffer)
+    })
+  })
 
   describe('putS3Object', () => {
     const metadata = {

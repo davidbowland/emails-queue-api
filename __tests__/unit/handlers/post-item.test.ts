@@ -2,6 +2,10 @@ import { email, event } from '../__mocks__'
 import { parseEventBody, postItem } from '../../../src/handlers/post-item'
 import status from '../../../src/util/status'
 
+const mockUploadContentsToS3 = jest.fn()
+jest.mock('../../../src/services/s3', () => ({
+  uploadContentsToS3: (uuid, body) => mockUploadContentsToS3(uuid, body),
+}))
 const mockAddToQueue = jest.fn()
 const mockFormatEmail = jest.fn()
 const mockIsValidEmail = jest.fn()
@@ -39,6 +43,7 @@ describe('post-item', () => {
       mockAddToQueue.mockResolvedValue(undefined)
       mockFormatEmail.mockResolvedValue(email)
       mockIsValidEmail.mockReturnValue(true)
+      mockUploadContentsToS3.mockResolvedValue(undefined)
     })
 
     test('expect NO_CONTENT when everything is valid', async () => {

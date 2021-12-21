@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "aws-sdk": "^2.799.0",
-    "fast-json-patch": "^3.1.0"
+    "fast-json-patch": "^3.1.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.16.5",
@@ -34,7 +35,8 @@
     "clean": "rm -rf dist coverage && NODE_ENV=test npm ci",
     "lint": "prettier --write . && eslint --fix . --resolve-plugins-relative-to .",
     "prepare": "if [ \"$HUSKY\" != \"0\" ]; then husky install ; fi",
-    "start": "tsc && HUSKY=0 sam build && sam local invoke --event events/post-item.json",
+    "start": "npm run build && npm run quick-start",
+    "quick-start": "tsc && HUSKY=0 sam build && EMAIL_BUCKET=emails-dbowland SQS_QUEUE_URL=https://sqs.us-east-1.amazonaws.com/494887012091/emails-queue-service-SimpleQueue-146A3KUXV7CRG sam local invoke --event events/post-item.json",
     "test": "npm run lint && jest --colors"
   },
   "lint-staged": {

@@ -8,6 +8,9 @@ export interface Metadata {
   [key: string]: string
 }
 
+export const uploadContentsToS3 = (uuid: string, body: Buffer | string): Promise<S3.PutObjectOutput> =>
+  exports.putS3Object(`queue/${uuid}`, body)
+
 /* Put */
 
 export const putS3Object = (key: string, body: Buffer | string, metadata: Metadata = {}): Promise<S3.PutObjectOutput> =>

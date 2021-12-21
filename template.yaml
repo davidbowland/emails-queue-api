@@ -49,8 +49,13 @@ Resources:
       Timeout: 30
       Description: Adds emails to the queue to be sent.
       Policies:
+        # Give Lambda basic execution Permission
+        - AWSLambdaBasicExecutionRole
+        # Grant access to S3 bucket
+        - S3WritePolicy:
+            BucketName: emails-dbowland
         # Grant access to SQS queue
-        - SQSPollerPolicy:
+        - SQSSendMessagePolicy:
             QueueName: emails-queue-service-SimpleQueue-146A3KUXV7CRG
       Environment:
         Variables:

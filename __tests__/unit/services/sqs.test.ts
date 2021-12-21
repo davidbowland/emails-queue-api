@@ -1,4 +1,4 @@
-import { email } from '../__mocks__'
+import { email, uuid } from '../__mocks__'
 import { sqsQueueUrl } from '../../../src/config'
 import { addToQueue, formatEmail, isValidEmail } from '../../../src/services/sqs'
 
@@ -37,8 +37,9 @@ describe('sqs', () => {
     })
 
     test('expect email to be added to queue', async () => {
-      await addToQueue(email)
-      expect(mockSendMessage).toHaveBeenCalledWith({ MessageBody: JSON.stringify({ email }), QueueUrl: sqsQueueUrl })
+      const body = { uuid }
+      await addToQueue(body)
+      expect(mockSendMessage).toHaveBeenCalledWith({ MessageBody: JSON.stringify(body), QueueUrl: sqsQueueUrl })
     })
   })
 })

@@ -101,3 +101,7 @@ export const event: APIGatewayEvent = {
     protocol: 'HTTP/1.1',
   },
 }
+
+export const messageBuffer = Buffer.from(JSON.stringify(email))
+
+export const uuid = 'aaaaa-uuuuu-uuuuu-iiiii-ddddd'
