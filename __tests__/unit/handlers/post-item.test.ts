@@ -5,10 +5,13 @@ import status from '../../../src/util/status'
 const mockAddToQueue = jest.fn()
 const mockFormatEmail = jest.fn()
 const mockIsValidEmail = jest.fn()
-jest.mock('@services/sqs', () => ({
+jest.mock('../../../src/services/sqs', () => ({
   addToQueue: (email) => mockAddToQueue(email),
   formatEmail: (email) => mockFormatEmail(email),
   isValidEmail: (email) => mockIsValidEmail(email),
+}))
+jest.mock('../../../src/util/error-handling', () => ({
+  handleErrorWithDefault: (value) => () => value,
 }))
 
 describe('post-item', () => {
