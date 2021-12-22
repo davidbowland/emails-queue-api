@@ -1,7 +1,11 @@
-import { email, event } from '../__mocks__'
+import { email, event, uuid } from '../__mocks__'
 import { parseEventBody, postItem } from '../../../src/handlers/post-item'
 import status from '../../../src/util/status'
 
+const mockUuid = jest.fn().mockReturnValue(uuid)
+jest.mock('uuid', () => ({
+  v1: () => mockUuid(),
+}))
 const mockUploadContentsToS3 = jest.fn()
 jest.mock('../../../src/services/s3', () => ({
   uploadContentsToS3: (uuid, body) => mockUploadContentsToS3(uuid, body),
@@ -49,6 +53,11 @@ describe('post-item', () => {
     test('expect NO_CONTENT when everything is valid', async () => {
       const result = await postItem(event)
       expect(result).toEqual(expect.objectContaining(status.NO_CONTENT))
+    })
+
+    test('expect uuid added to queue when everything is valid', async () => {
+      await postItem(event)
+      expect(mockAddToQueue).toHaveBeenCalledWith({ uuid })
     })
 
     test('expect NOT_FOUND when invalid method', async () => {

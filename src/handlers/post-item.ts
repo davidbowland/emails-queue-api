@@ -16,7 +16,7 @@ export const parseEventBody = (event: APIGatewayEvent): Promise<Email> =>
 const processEmail = (email: Email) =>
   Promise.resolve(uuidv1()).then((uuid) =>
     uploadContentsToS3(uuid, JSON.stringify(email))
-      .then(() => addToQueue(uuid))
+      .then(() => addToQueue({ uuid }))
       .then(() => status.NO_CONTENT)
   )
 
