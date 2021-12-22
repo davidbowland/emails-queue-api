@@ -23,7 +23,7 @@ const processEmail = (email: Email) =>
 const isValidMethod = (event: APIGatewayEvent): boolean => (event.httpMethod == 'POST' ? true : false)
 
 export const postItem = (event: APIGatewayEvent): Promise<unknown> =>
-  Promise.resolve(isValidMethod(event))
+  Promise.resolve((console.log('Received event', { ...event, body: undefined }), isValidMethod(event)))
     .then((isValidMethod) =>
       isValidMethod
         ? exports
