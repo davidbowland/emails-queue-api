@@ -1,6 +1,6 @@
 import { SQS } from 'aws-sdk'
 
-import { sqsQueueUrl } from '../config'
+import { sqsMessageGroupId, sqsQueueUrl } from '../config'
 
 const sqs = new SQS({ apiVersion: '2012-11-05' })
 
@@ -47,6 +47,8 @@ export const addToQueue = (data: { [key: string]: string }) =>
   sqs
     .sendMessage({
       MessageBody: JSON.stringify(data),
+      MessageDeduplicationId: data.uuid,
+      MessageGroupId: sqsMessageGroupId,
       QueueUrl: sqsQueueUrl,
     })
     .promise()

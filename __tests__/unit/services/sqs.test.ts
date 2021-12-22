@@ -39,7 +39,12 @@ describe('sqs', () => {
     test('expect email to be added to queue', async () => {
       const body = { uuid }
       await addToQueue(body)
-      expect(mockSendMessage).toHaveBeenCalledWith({ MessageBody: JSON.stringify(body), QueueUrl: sqsQueueUrl })
+      expect(mockSendMessage).toHaveBeenCalledWith({
+        MessageBody: JSON.stringify(body),
+        MessageDeduplicationId: uuid,
+        MessageGroupId: 'message-queue-id',
+        QueueUrl: sqsQueueUrl,
+      })
     })
   })
 })

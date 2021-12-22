@@ -61,6 +61,7 @@ Resources:
         Variables:
           EMAIL_BUCKET: emails-dbowland
           EMAIL_REGION: us-east-1
+          SQS_MESSAGE_QUEUE_ID: emails
           SQS_QUEUE_URL: 'https://sqs.us-east-1.amazonaws.com/494887012091/emails-queue-service-SimpleQueue-1S70UGPUYHOUI.fifo'
       Events:
         ApiKey:
