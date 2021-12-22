@@ -3,7 +3,7 @@ import { v1 as uuidv1 } from 'uuid'
 
 import { uploadContentsToS3 } from '../services/s3'
 import { addToQueue, formatEmail, isValidEmail, Email } from '../services/sqs'
-import { handleErrorWithDefault } from '../util/error-handling'
+import { handleErrorWithDefault, log } from '../util/error-handling'
 import status from '../util/status'
 
 export const parseEventBody = (event: APIGatewayEvent): Promise<Email> =>
@@ -23,7 +23,7 @@ const processEmail = (email: Email) =>
 const isValidMethod = (event: APIGatewayEvent): boolean => (event.httpMethod == 'POST' ? true : false)
 
 export const postItem = (event: APIGatewayEvent): Promise<unknown> =>
-  Promise.resolve((console.log('Received event', { ...event, body: undefined }), isValidMethod(event)))
+  Promise.resolve((log()('Received event', { ...event, body: undefined }), isValidMethod(event)))
     .then((isValidMethod) =>
       isValidMethod
         ? exports

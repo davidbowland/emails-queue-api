@@ -20,6 +20,7 @@ jest.mock('../../../src/services/sqs', () => ({
 }))
 jest.mock('../../../src/util/error-handling', () => ({
   handleErrorWithDefault: (value) => () => value,
+  log: () => () => undefined,
 }))
 
 describe('post-item', () => {
