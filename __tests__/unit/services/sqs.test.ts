@@ -1,11 +1,11 @@
 import { email, uuid } from '../__mocks__'
-import { sqsQueueUrl } from '../../../src/config'
-import { addToQueue, formatEmail, isValidEmail } from '../../../src/services/sqs'
+import { sqsQueueUrl } from '@config'
+import { addToQueue, formatEmail, isValidEmail } from '@services/sqs'
 
 const mockSendMessage = jest.fn()
 jest.mock('aws-sdk', () => ({
   SQS: jest.fn(() => ({
-    sendMessage: (params) => ({ promise: () => mockSendMessage(params) }),
+    sendMessage: (...args) => ({ promise: () => mockSendMessage(...args) }),
   })),
 }))
 

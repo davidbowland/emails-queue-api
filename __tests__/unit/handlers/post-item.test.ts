@@ -1,29 +1,25 @@
-import { email, event, uuid } from '../__mocks__'
-import { parseEventBody, postItem } from '../../../src/handlers/post-item'
-import status from '../../../src/util/status'
+import { mocked } from 'jest-mock'
+import * as uuid from 'uuid'
 
-const mockUuid = jest.fn().mockReturnValue(uuid)
-jest.mock('uuid', () => ({
-  v1: () => mockUuid(),
-}))
-const mockUploadContentsToS3 = jest.fn()
-jest.mock('../../../src/services/s3', () => ({
-  uploadContentsToS3: (uuid, body) => mockUploadContentsToS3(uuid, body),
-}))
-const mockAddToQueue = jest.fn()
-const mockFormatEmail = jest.fn()
-const mockIsValidEmail = jest.fn()
-jest.mock('../../../src/services/sqs', () => ({
-  addToQueue: (email) => mockAddToQueue(email),
-  formatEmail: (email) => mockFormatEmail(email),
-  isValidEmail: (email) => mockIsValidEmail(email),
-}))
-jest.mock('../../../src/util/error-handling', () => ({
+import { email, event, uuid as expectedUuid } from '../__mocks__'
+import { parseEventBody, postItem } from '@handlers/post-item'
+import * as s3 from '@services/s3'
+import * as sqs from '@services/sqs'
+import status from '@util/status'
+
+jest.mock('uuid')
+jest.mock('@services/s3')
+jest.mock('@services/sqs')
+jest.mock('@util/error-handling', () => ({
   handleErrorWithDefault: (value) => () => value,
   log: () => () => undefined,
 }))
 
 describe('post-item', () => {
+  beforeAll(() => {
+    mocked(uuid).v1.mockReturnValue(expectedUuid)
+  })
+
   describe('parseEventBody', () => {
     test.each([true, false])(
       'expect bodies to be base64 decoded, when necessary (isBase64Encoded=%s)',
@@ -45,10 +41,10 @@ describe('post-item', () => {
 
   describe('postItem', () => {
     beforeAll(() => {
-      mockAddToQueue.mockResolvedValue(undefined)
-      mockFormatEmail.mockResolvedValue(email)
-      mockIsValidEmail.mockReturnValue(true)
-      mockUploadContentsToS3.mockResolvedValue(undefined)
+      mocked(sqs).addToQueue.mockResolvedValue(undefined)
+      mocked(sqs).formatEmail.mockResolvedValue(email)
+      mocked(sqs).isValidEmail.mockReturnValue(true)
+      mocked(s3).uploadContentsToS3.mockResolvedValue(undefined)
     })
 
     test('expect NO_CONTENT when everything is valid', async () => {
@@ -58,7 +54,7 @@ describe('post-item', () => {
 
     test('expect uuid added to queue when everything is valid', async () => {
       await postItem(event)
-      expect(mockAddToQueue).toHaveBeenCalledWith({ uuid })
+      expect(mocked(sqs).addToQueue).toHaveBeenCalledWith({ uuid: expectedUuid })
     })
 
     test('expect NOT_FOUND when invalid method', async () => {
@@ -67,7 +63,7 @@ describe('post-item', () => {
     })
 
     test('expect BAD_REQUEST when invalid email', async () => {
-      mockIsValidEmail.mockReturnValue(false)
+      mocked(sqs).isValidEmail.mockReturnValue(false)
       const result = await postItem({ ...event, body: JSON.stringify({ to: 'e@mail.address' }) })
       expect(result).toEqual(expect.objectContaining(status.BAD_REQUEST))
     })

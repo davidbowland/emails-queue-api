@@ -1,5 +1,3 @@
-import { S3 } from 'aws-sdk'
-
 import { messageBuffer, uuid } from '../__mocks__'
 import { emailBucket } from '../../../src/config'
 import * as s3Module from '../../../src/services/s3'
@@ -8,7 +6,7 @@ import { putS3Object, uploadContentsToS3 } from '../../../src/services/s3'
 const mockPutObject = jest.fn()
 jest.mock('aws-sdk', () => ({
   S3: jest.fn(() => ({
-    putObject: (params: S3.Types.PutObjectRequest) => ({ promise: () => mockPutObject(params) }),
+    putObject: (...args) => ({ promise: () => mockPutObject(...args) }),
   })),
 }))
 
