@@ -72,3 +72,10 @@ Resources:
             Method: post
             Auth:
               ApiKeyRequired: true
+
+  LambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    DependsOn: [postItemFunction]
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${postItemFunction}
+      RetentionInDays: 30
