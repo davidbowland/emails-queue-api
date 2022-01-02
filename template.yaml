@@ -12,6 +12,15 @@ Description: >-
 Transform:
   - AWS::Serverless-2016-10-31
 
+Parameters:
+  Subdomain:
+    Type: String
+    Default: emails-queue-api
+    AllowedValues:
+      - emails-queue-api
+      - emails-queue-api-test
+    Description: Subdomain to use for API
+
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
@@ -25,7 +34,7 @@ Resources:
           CreateUsagePlan: PER_API
           Description: Usage plan for emails-queue-api
       Domain:
-        DomainName: emails-queue-api.bowland.link
+        DomainName: !Sub ${Subdomain}.bowland.link
         CertificateArn: arn:aws:acm:us-east-1:494887012091:certificate/7f4606f7-302c-40a8-ac9d-e63db9b7a712
         EndpointConfiguration: EDGE
         Route53:
