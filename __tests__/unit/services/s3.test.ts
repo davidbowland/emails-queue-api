@@ -1,17 +1,13 @@
 import { messageBuffer, uuid } from '../__mocks__'
-import { emailBucket } from '../../../src/config'
-import * as s3Module from '../../../src/services/s3'
-import { putS3Object, uploadContentsToS3 } from '../../../src/services/s3'
+import { emailBucket } from '@config'
+import * as s3Module from '@services/s3'
+import { putS3Object, uploadContentsToS3 } from '@services/s3'
 
 const mockPutObject = jest.fn()
 jest.mock('aws-sdk', () => ({
   S3: jest.fn(() => ({
     putObject: (...args) => ({ promise: () => mockPutObject(...args) }),
   })),
-}))
-
-jest.mock('../../../src/util/error-handling', () => ({
-  handleErrorWithDefault: (value) => () => value,
 }))
 
 describe('S3', () => {

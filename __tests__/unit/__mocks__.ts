@@ -1,20 +1,19 @@
-import { APIGatewayEvent } from 'aws-lambda'
-import { Email } from '../../src/services/sqs'
+import { APIGatewayEvent, Email } from '@types'
 
 export const email: Email = {
-  from: 'A Person <email@address.com>',
-  sender: 'A Person <email@address.com>',
-  to: ['Another Person <another@address.com>'],
-  replyTo: 'email@address.com',
-  inReplyTo: 'ytfghj6tghj',
-  references: ['87ytgbnmnbgf', '876tghjhtyu'],
+  attachments: undefined,
+  from: 'do-not-reply@bowland.link',
+  to: ['david@bowland.link'],
+  inReplyTo: undefined,
+  references: [],
+  replyTo: 'dave@bowland.link',
+  sender: 'do-not-reply@bowland.link',
   subject: 'Hi there!',
   text: 'Hello, world',
   html: '<p>Hello, world</p>',
   headers: {
-    'Content-Type': 'text/html',
+    From: 'do-not-reply@bowland.link',
   },
-  attachments: [],
 }
 
 export const event: APIGatewayEvent = {
@@ -100,7 +99,7 @@ export const event: APIGatewayEvent = {
     apiId: '1234567890',
     protocol: 'HTTP/1.1',
   },
-}
+} as unknown as APIGatewayEvent
 
 export const messageBuffer = Buffer.from(JSON.stringify(email))
 

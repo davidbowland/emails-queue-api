@@ -1,76 +1,71 @@
 import { mocked } from 'jest-mock'
 import * as uuid from 'uuid'
 
-import { email, event, uuid as expectedUuid } from '../__mocks__'
-import { parseEventBody, postItem } from '@handlers/post-item'
+import { email, uuid as expectedUuid } from '../__mocks__'
+import eventJson from '@events/post-item.json'
+import { postItem } from '@handlers/post-item'
 import * as s3 from '@services/s3'
 import * as sqs from '@services/sqs'
-import status from '@util/status'
+import { APIGatewayEvent } from '@types'
+import * as events from '@utils/events'
+import * as logging from '@utils/logging'
+import status from '@utils/status'
 
 jest.mock('uuid')
 jest.mock('@services/s3')
 jest.mock('@services/sqs')
-jest.mock('@util/error-handling', () => ({
-  handleErrorWithDefault: (value) => () => value,
-  log: () => () => undefined,
-}))
+jest.mock('@utils/events')
+jest.mock('@utils/logging')
 
 describe('post-item', () => {
+  const event = eventJson as unknown as APIGatewayEvent
+
   beforeAll(() => {
+    mocked(events).extractEmailFromEvent.mockResolvedValue(email)
+    mocked(logging).log.mockResolvedValue(undefined)
+    mocked(logging).logErrorWithDefault.mockImplementation((value) => async () => value)
+    mocked(s3).uploadContentsToS3.mockResolvedValue(undefined)
+    mocked(sqs).addToQueue.mockResolvedValue(undefined)
     mocked(uuid).v1.mockReturnValue(expectedUuid)
   })
 
-  describe('parseEventBody', () => {
-    test.each([true, false])(
-      'expect bodies to be base64 decoded, when necessary (isBase64Encoded=%s)',
-      async (isBase64Encoded: boolean) => {
-        const expectedResult = { motto: 'veni vidi vici' }
-        const tempEvent = {
-          ...event,
-          isBase64Encoded,
-          body: isBase64Encoded
-            ? Buffer.from(JSON.stringify(expectedResult)).toString('base64')
-            : JSON.stringify(expectedResult),
-        }
-
-        const result = await parseEventBody(tempEvent)
-        expect(result).toEqual(expectedResult)
-      }
-    )
-  })
-
   describe('postItem', () => {
-    beforeAll(() => {
-      mocked(sqs).addToQueue.mockResolvedValue(undefined)
-      mocked(sqs).formatEmail.mockResolvedValue(email)
-      mocked(sqs).isValidEmail.mockReturnValue(true)
-      mocked(s3).uploadContentsToS3.mockResolvedValue(undefined)
+    test('expect event object logged without body', async () => {
+      await postItem(event)
+      expect(mocked(logging).log).toHaveBeenCalledWith(expect.anything(), { ...event, body: undefined })
     })
 
-    test('expect NO_CONTENT when everything is valid', async () => {
+    test('expect BAD_REQUEST when extractEmailFromEvent throws', async () => {
+      mocked(events).extractEmailFromEvent.mockRejectedValueOnce(undefined)
       const result = await postItem(event)
-      expect(result).toEqual(expect.objectContaining(status.NO_CONTENT))
+      expect(result).toEqual({ ...status.BAD_REQUEST, body: '{}' })
     })
 
-    test('expect uuid added to queue when everything is valid', async () => {
+    test('expect contents uploaded to S3', async () => {
+      await postItem(event)
+      expect(mocked(s3).uploadContentsToS3).toHaveBeenCalledWith(expectedUuid, JSON.stringify(email))
+    })
+
+    test('expect INTERNAL_SERVER_ERROR when upload error', async () => {
+      mocked(s3).uploadContentsToS3.mockRejectedValueOnce(undefined)
+      const result = await postItem(event)
+      expect(result).toEqual(expect.objectContaining(status.INTERNAL_SERVER_ERROR))
+    })
+
+    test('expect uuid added to queue', async () => {
       await postItem(event)
       expect(mocked(sqs).addToQueue).toHaveBeenCalledWith({ uuid: expectedUuid })
     })
 
-    test('expect NOT_FOUND when invalid method', async () => {
-      const result = await postItem({ ...event, httpMethod: 'GET' })
-      expect(result).toEqual(expect.objectContaining(status.NOT_FOUND))
-    })
-
-    test('expect BAD_REQUEST when invalid email', async () => {
-      mocked(sqs).isValidEmail.mockReturnValue(false)
-      const result = await postItem({ ...event, body: JSON.stringify({ to: 'e@mail.address' }) })
-      expect(result).toEqual(expect.objectContaining(status.BAD_REQUEST))
-    })
-
-    test('expect INTERNAL_SERVER_ERROR when invalid email JSON', async () => {
-      const result = await postItem({ ...event, body: 'fnord' })
+    test('expect INTERNAL_SERVER_ERROR when queue error', async () => {
+      mocked(sqs).addToQueue.mockRejectedValueOnce(undefined)
+      const result = await postItem(event)
       expect(result).toEqual(expect.objectContaining(status.INTERNAL_SERVER_ERROR))
+    })
+
+    test('expect NO_CONTENT when success', async () => {
+      const result = await postItem(event)
+      expect(result).toEqual(expect.objectContaining(status.NO_CONTENT))
     })
   })
 })
