@@ -62,13 +62,13 @@ Resources:
         - AWSLambdaBasicExecutionRole
         # Grant access to S3 bucket
         - S3WritePolicy:
-            BucketName: emails-dbowland
+            BucketName: emails-service-storage
         # Grant access to SQS queue
         - SQSSendMessagePolicy:
             QueueName: emails-queue-service-SimpleQueue-1S70UGPUYHOUI.fifo
       Environment:
         Variables:
-          EMAIL_BUCKET: emails-dbowland
+          EMAIL_BUCKET: emails-service-storage
           EMAIL_REGION: us-east-1
           SQS_MESSAGE_QUEUE_ID: emails
           SQS_QUEUE_URL: 'https://sqs.us-east-1.amazonaws.com/494887012091/emails-queue-service-SimpleQueue-1S70UGPUYHOUI.fifo'
