@@ -1,28 +1,33 @@
-# This is the SAM template that represents the architecture of your serverless application
-# https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-template-basics.html
-
-# The AWSTemplateFormatVersion identifies the capabilities of the template
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/format-version-structure.html
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
   emails-queue-api
 
-# Transform section specifies one or more macros that AWS CloudFormation uses to process your template
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html
 Transform:
   - AWS::Serverless-2016-10-31
 
 Parameters:
-  Subdomain:
+  AccountId:
     Type: String
-    Default: emails-queue-api
+    Description: AWS account ID
+  Environment:
+    Type: String
+    Default: prod
     AllowedValues:
-      - emails-queue-api
-      - emails-queue-api-test
-    Description: Subdomain to use for API
+      - prod
+      - test
+    Description: Environment for deploy
 
-# Resources declares the AWS resources that you want to include in the stack
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
+Mappings:
+  EnvironmentMap:
+    prod:
+      bucket: emails-service-storage
+      domain: emails-queue-api.bowland.link
+      queue: emails-queue-service-SimpleQueue-1S70UGPUYHOUI.fifo
+    test:
+      bucket: emails-service-storage-test
+      domain: emails-queue-api-test.bowland.link
+      queue: emails-queue-service-test-SimpleQueue-1RVBFSJJJDFXF.fifo
+
 Resources:
   Api:
     Type: AWS::Serverless::Api
@@ -34,19 +39,15 @@ Resources:
           CreateUsagePlan: PER_API
           Description: Usage plan for emails-queue-api
       Domain:
-        DomainName: !Sub ${Subdomain}.bowland.link
-        CertificateArn: arn:aws:acm:us-east-1:494887012091:certificate/7f4606f7-302c-40a8-ac9d-e63db9b7a712
+        DomainName: !FindInMap [EnvironmentMap, !Ref Environment, domain]
+        CertificateArn: !Sub 'arn:aws:acm:us-east-1:${AccountId}:certificate/7f4606f7-302c-40a8-ac9d-e63db9b7a712'
         EndpointConfiguration: EDGE
         Route53:
           HostedZoneId: Z01312547RGU1BYKIJXY
         BasePath:
           - /v1
 
-  # Each Lambda function is defined by properties:
-  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-
-  # This is a Lambda function config associated with the source code: get-all-items.js
-  postItemFunction:
+  PostItemFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: handlers/post-item.postItem
@@ -62,16 +63,18 @@ Resources:
         - AWSLambdaBasicExecutionRole
         # Grant access to S3 bucket
         - S3WritePolicy:
-            BucketName: emails-service-storage
+            BucketName: !FindInMap [EnvironmentMap, !Ref Environment, bucket]
         # Grant access to SQS queue
         - SQSSendMessagePolicy:
-            QueueName: emails-queue-service-SimpleQueue-1S70UGPUYHOUI.fifo
+            QueueName: !FindInMap [EnvironmentMap, !Ref Environment, queue]
       Environment:
         Variables:
-          EMAIL_BUCKET: emails-service-storage
+          EMAIL_BUCKET: !FindInMap [EnvironmentMap, !Ref Environment, bucket]
           EMAIL_REGION: us-east-1
           SQS_MESSAGE_QUEUE_ID: emails
-          SQS_QUEUE_URL: 'https://sqs.us-east-1.amazonaws.com/494887012091/emails-queue-service-SimpleQueue-1S70UGPUYHOUI.fifo'
+          SQS_QUEUE_URL: !Sub
+            - 'https://sqs.us-east-1.amazonaws.com/${AccountId}/${Queue}'
+            - Queue: !FindInMap [EnvironmentMap, !Ref Environment, queue]
       Events:
         ApiKey:
           Type: Api
@@ -84,7 +87,7 @@ Resources:
 
   LambdaLogGroup:
     Type: AWS::Logs::LogGroup
-    DependsOn: [postItemFunction]
+    DependsOn: [PostItemFunction]
     Properties:
-      LogGroupName: !Sub /aws/lambda/${postItemFunction}
+      LogGroupName: !Sub /aws/lambda/${PostItemFunction}
       RetentionInDays: 30
