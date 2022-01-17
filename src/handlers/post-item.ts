@@ -4,19 +4,27 @@ import { uploadContentsToS3 } from '../services/s3'
 import { addToQueue } from '../services/sqs'
 import { APIGatewayEvent, APIGatewayProxyResult, Email } from '../types'
 import { extractEmailFromEvent } from '../utils/events'
-import { logErrorWithDefault, log } from '../utils/logging'
+import { log, logError } from '../utils/logging'
 import status from '../utils/status'
 
-const processEmail = (email: Email): Promise<APIGatewayProxyResult> =>
-  Promise.resolve(uuidv1())
-    .then((uuid) =>
-      uploadContentsToS3(uuid, JSON.stringify(email))
-        .then(() => addToQueue({ uuid }))
-        .then(() => status.NO_CONTENT)
-    )
-    .catch(logErrorWithDefault(status.INTERNAL_SERVER_ERROR))
+const processEmail = async (email: Email): Promise<APIGatewayProxyResult> => {
+  try {
+    const uuid = uuidv1()
+    await uploadContentsToS3(uuid, JSON.stringify(email))
+    await addToQueue({ uuid })
+    return status.NO_CONTENT
+  } catch (error) {
+    logError(error)
+    return status.INTERNAL_SERVER_ERROR
+  }
+}
 
-export const postItem = (event: APIGatewayEvent): Promise<APIGatewayProxyResult> =>
+export const postItem = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
   log('Received event', { ...event, body: undefined })
-    .then(() => extractEmailFromEvent(event).then(processEmail))
-    .catch((err) => ({ ...status.BAD_REQUEST, body: JSON.stringify({ message: err }) }))
+  try {
+    const email = await extractEmailFromEvent(event)
+    return await processEmail(email)
+  } catch (error) {
+    return { ...status.BAD_REQUEST, body: JSON.stringify({ message: error }) }
+  }
+}
