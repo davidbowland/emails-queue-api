@@ -22,8 +22,6 @@ describe('post-item', () => {
 
   beforeAll(() => {
     mocked(events).extractEmailFromEvent.mockResolvedValue(email)
-    mocked(logging).log.mockResolvedValue(undefined)
-    mocked(logging).logErrorWithDefault.mockImplementation((value) => async () => value)
     mocked(s3).uploadContentsToS3.mockResolvedValue(undefined)
     mocked(sqs).addToQueue.mockResolvedValue(undefined)
     mocked(uuid).v1.mockReturnValue(expectedUuid)
