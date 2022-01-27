@@ -28,7 +28,7 @@ Mappings:
     test:
       bucket: emails-service-storage-test
       certificate: 6a48cba7-feb9-4de5-8cbf-d383140fcdef
-      domain: emails-queue-api-test.bowland.link
+      domain: emails-queue-api.bowland.link
       queue: emails-queue-service-test-SimpleQueue-1RVBFSJJJDFXF.fifo
       zoneId: Z01312547RGU1BYKIJXY
 
