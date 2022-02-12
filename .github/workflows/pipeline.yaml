@@ -58,8 +58,10 @@ jobs:
           node-version: 14.x
       - name: Install NPM 8
         run: npm install -g npm@8
-      - uses: actions/setup-python@v2
-      - uses: aws-actions/setup-sam@v1
+      - name: Install Python 2
+        uses: actions/setup-python@v2
+      - name: Install AWS SAM
+        uses: aws-actions/setup-sam@v1
       - name: Build TypeScript into Lambda
         run: npm run build
         env:
@@ -102,8 +104,10 @@ jobs:
           node-version: 14.x
       - name: Install NPM 8
         run: npm install -g npm@8
-      - uses: actions/setup-python@v2
-      - uses: aws-actions/setup-sam@v1
+      - name: Install Python 2
+        uses: actions/setup-python@v2
+      - name: Install AWS SAM
+        uses: aws-actions/setup-sam@v1
 
       - name: Build resources
         run: |
@@ -166,8 +170,10 @@ jobs:
     steps:
       - name: Checkout latest code
         uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-      - uses: aws-actions/setup-sam@v1
+      - name: Install Python 2
+        uses: actions/setup-python@v2
+      - name: Install AWS SAM
+        uses: aws-actions/setup-sam@v1
       - uses: actions/download-artifact@v2
         with:
           name: packaged-testing.yaml
@@ -202,8 +208,10 @@ jobs:
     steps:
       - name: Checkout latest code
         uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-      - uses: aws-actions/setup-sam@v1
+      - name: Install Python 2
+        uses: actions/setup-python@v2
+      - name: Install AWS SAM
+        uses: aws-actions/setup-sam@v1
       - uses: actions/download-artifact@v2
         with:
           name: packaged-prod.yaml
