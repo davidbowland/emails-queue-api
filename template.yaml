@@ -20,12 +20,14 @@ Mappings:
       bucket: emails-service-storage
       certificate: adce1a21-90b4-4120-8548-111215e582f0
       domain: emails-queue-api.dbowland.com
+      logStreamFunction: log-subscriber
       queue: emails-queue-service-SimpleQueue-1S70UGPUYHOUI.fifo
       zoneId: Z072422417XWM8PIXXSFA
     test:
       bucket: emails-service-storage-test
       certificate: 6a48cba7-feb9-4de5-8cbf-d383140fcdef
       domain: emails-queue-api.bowland.link
+      logStreamFunction: log-subscriber-test
       queue: emails-queue-service-test-SimpleQueue-1RVBFSJJJDFXF.fifo
       zoneId: Z01312547RGU1BYKIJXY
 
@@ -94,3 +96,12 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${PostItemFunction}
       RetentionInDays: 30
+
+  LambdaLogGroupSubscription:
+    Type: AWS::Logs::SubscriptionFilter
+    Properties:
+      DestinationArn: !Sub
+        - 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Function}'
+        - Function: !FindInMap [EnvironmentMap, !Ref Environment, logStreamFunction]
+      FilterPattern: '[timestamp, uuid, level="ERROR", message]'
+      LogGroupName: !Ref LambdaLogGroup
