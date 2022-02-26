@@ -6,9 +6,6 @@ Transform:
   - AWS::Serverless-2016-10-31
 
 Parameters:
-  AccountId:
-    Type: String
-    Description: AWS account ID
   Environment:
     Type: String
     Default: prod
@@ -45,7 +42,7 @@ Resources:
       Domain:
         DomainName: !FindInMap [EnvironmentMap, !Ref Environment, domain]
         CertificateArn: !Sub
-          - 'arn:aws:acm:us-east-1:${AccountId}:certificate/${Certificate}'
+          - 'arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/${Certificate}'
           - Certificate: !FindInMap [EnvironmentMap, !Ref Environment, certificate]
         EndpointConfiguration: EDGE
         Route53:
@@ -79,7 +76,7 @@ Resources:
           EMAIL_REGION: us-east-1
           SQS_MESSAGE_QUEUE_ID: emails
           SQS_QUEUE_URL: !Sub
-            - 'https://sqs.us-east-1.amazonaws.com/${AccountId}/${Queue}'
+            - 'https://sqs.us-east-1.amazonaws.com/${AWS::AccountId}/${Queue}'
             - Queue: !FindInMap [EnvironmentMap, !Ref Environment, queue]
       Events:
         ApiKey:
