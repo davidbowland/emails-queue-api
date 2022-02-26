@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  emails-queue-api
+  API for email SQS queue
 
 Transform:
   - AWS::Serverless-2016-10-31
