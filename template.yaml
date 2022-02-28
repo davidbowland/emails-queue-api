@@ -32,6 +32,8 @@ Mappings:
       zoneId: Z01312547RGU1BYKIJXY
 
 Resources:
+  # API Gateway
+
   Api:
     Type: AWS::Serverless::Api
     Properties:
@@ -44,13 +46,15 @@ Resources:
       Domain:
         DomainName: !FindInMap [EnvironmentMap, !Ref Environment, domain]
         CertificateArn: !Sub
-          - 'arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/${Certificate}'
+          - 'arn:aws:acm:${AWS::Region}:${AWS::AccountId}:certificate/${Certificate}'
           - Certificate: !FindInMap [EnvironmentMap, !Ref Environment, certificate]
         EndpointConfiguration: EDGE
         Route53:
           HostedZoneId: !FindInMap [EnvironmentMap, !Ref Environment, zoneId]
         BasePath:
           - /v1
+
+  # Lambda
 
   PostItemFunction:
     Type: AWS::Serverless::Function
