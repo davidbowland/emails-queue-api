@@ -22,9 +22,9 @@ const processEmail = async (email: Email): Promise<APIGatewayProxyResult> => {
 export const postItem = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
   log('Received event', { ...event, body: undefined })
   try {
-    const email = await extractEmailFromEvent(event)
+    const email = extractEmailFromEvent(event)
     return await processEmail(email)
   } catch (error) {
-    return { ...status.BAD_REQUEST, body: JSON.stringify({ message: error }) }
+    return { ...status.BAD_REQUEST, body: JSON.stringify({ message: error.message }) }
   }
 }

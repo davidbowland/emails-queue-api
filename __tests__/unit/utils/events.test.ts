@@ -12,29 +12,29 @@ describe('event', () => {
       { body: JSON.stringify({ ...email, to: undefined }) },
       { body: JSON.stringify({ ...email, subject: undefined }) },
       { body: JSON.stringify({ ...email, text: undefined }) },
-    ])('expect reject for bad email', async (tempEvent: unknown) => {
-      await expect(extractEmailFromEvent(tempEvent as APIGatewayEvent)).rejects.toBeDefined()
+    ])('expect reject for bad email', (tempEvent: unknown) => {
+      expect(() => extractEmailFromEvent(tempEvent as APIGatewayEvent)).toThrow()
     })
 
-    test('expect formatted email from event', async () => {
-      const result = await extractEmailFromEvent(event)
+    test('expect formatted email from event', () => {
+      const result = extractEmailFromEvent(event)
       expect(result).toEqual(email)
     })
 
-    test('expect formatted email from event when base64', async () => {
+    test('expect formatted email from event when base64', () => {
       const tempEvent = {
         ...event,
         isBase64Encoded: true,
         body: Buffer.from(JSON.stringify(email)).toString('base64'),
       } as unknown as APIGatewayEvent
-      const result = await extractEmailFromEvent(tempEvent)
+      const result = extractEmailFromEvent(tempEvent)
       expect(result).toEqual(email)
     })
 
-    test('expect formatted email from reduced event', async () => {
+    test('expect formatted email from reduced event', () => {
       const tempEmail = { ...email, sender: undefined, replyTo: undefined, html: undefined }
       const tempEvent = { ...event, body: JSON.stringify(tempEmail) } as unknown as APIGatewayEvent
-      const result = await extractEmailFromEvent(tempEvent)
+      const result = extractEmailFromEvent(tempEvent)
       expect(result).toEqual({
         attachments: undefined,
         from: 'do-not-reply@bowland.link',

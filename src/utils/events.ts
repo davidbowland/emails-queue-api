@@ -2,16 +2,18 @@ import { APIGatewayEvent, Email } from '../types'
 
 /* Email */
 
-const isValidEmail = (email: Email): Promise<Email> =>
-  Promise.resolve()
-    .then(() => email.from ?? Promise.reject('Missing from address value'))
-    .then(() => (email.to?.length && email.to[0]) || Promise.reject('Missing to address array values'))
-    .then(() => email.subject ?? Promise.reject('Missing subject value'))
-    .then(() => email.text ?? Promise.reject('Missing text value'))
-    .then(() => email)
+const formatEmail = (email: Email): Email => {
+  if (!email.from) {
+    throw new Error('Missing from address value')
+  } else if (!email.to?.length || !email.to[0]) {
+    throw new Error('Missing to address array values')
+  } else if (!email.subject) {
+    throw new Error('Missing subject value')
+  } else if (!email.text) {
+    throw new Error('Missing text value')
+  }
 
-const formatEmail = (email: Email): Promise<Email> =>
-  isValidEmail(email).then(() => ({
+  return {
     from: email.from,
     sender: email.sender ?? email.from,
     to: email.to,
@@ -23,15 +25,14 @@ const formatEmail = (email: Email): Promise<Email> =>
     html: email.html ?? email.text,
     headers: email.headers,
     attachments: email.attachments,
-  }))
+  }
+}
 
 /* Event */
 
-const parseEventBody = (event: APIGatewayEvent): Promise<Email> =>
-  Promise.resolve(
-    JSON.parse(
-      event.isBase64Encoded && event.body ? Buffer.from(event.body, 'base64').toString('utf8') : (event.body as string)
-    )
+const parseEventBody = (event: APIGatewayEvent): Email =>
+  JSON.parse(
+    event.isBase64Encoded && event.body ? Buffer.from(event.body, 'base64').toString('utf8') : (event.body as string)
   )
 
-export const extractEmailFromEvent = (event: APIGatewayEvent): Promise<Email> => parseEventBody(event).then(formatEmail)
+export const extractEmailFromEvent = (event: APIGatewayEvent): Email => formatEmail(parseEventBody(event))

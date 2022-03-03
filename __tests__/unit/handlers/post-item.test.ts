@@ -21,7 +21,7 @@ describe('post-item', () => {
   const event = eventJson as unknown as APIGatewayEvent
 
   beforeAll(() => {
-    mocked(events).extractEmailFromEvent.mockResolvedValue(email)
+    mocked(events).extractEmailFromEvent.mockReturnValue(email)
     mocked(s3).uploadContentsToS3.mockResolvedValue(undefined)
     mocked(sqs).addToQueue.mockResolvedValue(undefined)
     mocked(uuid).v1.mockReturnValue(expectedUuid)
@@ -34,9 +34,11 @@ describe('post-item', () => {
     })
 
     test('expect BAD_REQUEST when extractEmailFromEvent throws', async () => {
-      mocked(events).extractEmailFromEvent.mockRejectedValueOnce(undefined)
+      mocked(events).extractEmailFromEvent.mockImplementationOnce(() => {
+        throw new Error('Bad request')
+      })
       const result = await postItem(event)
-      expect(result).toEqual({ ...status.BAD_REQUEST, body: '{}' })
+      expect(result).toEqual(status.BAD_REQUEST)
     })
 
     test('expect contents uploaded to S3', async () => {
