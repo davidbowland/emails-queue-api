@@ -11,7 +11,7 @@ describe('event', () => {
       { body: JSON.stringify({ ...email, from: undefined }) },
       { body: JSON.stringify({ ...email, to: undefined }) },
       { body: JSON.stringify({ ...email, subject: undefined }) },
-      { body: JSON.stringify({ ...email, text: undefined }) },
+      { body: JSON.stringify({ ...email, text: undefined, html: undefined }) },
     ])('expect reject for bad email', (tempEvent: unknown) => {
       expect(() => extractEmailFromEvent(tempEvent as APIGatewayEvent)).toThrow()
     })

@@ -9,8 +9,8 @@ const formatEmail = (email: Email): Email => {
     throw new Error('Missing to address array values')
   } else if (!email.subject) {
     throw new Error('Missing subject value')
-  } else if (!email.text) {
-    throw new Error('Missing text value')
+  } else if (!email.text && !email.html) {
+    throw new Error('Either text or html must be supplied')
   }
 
   return {
