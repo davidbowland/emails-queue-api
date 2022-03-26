@@ -1,6 +1,7 @@
 import { uuid } from '../__mocks__'
-import { sqsQueueUrl } from '@config'
+
 import { addToQueue } from '@services/sqs'
+import { sqsQueueUrl } from '@config'
 
 const mockSendMessage = jest.fn()
 jest.mock('aws-sdk', () => ({

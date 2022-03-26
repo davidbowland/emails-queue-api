@@ -1,6 +1,6 @@
+import { APIGatewayEvent } from '@types'
 import { email } from '../__mocks__'
 import eventJson from '@events/post-item.json'
-import { APIGatewayEvent } from '@types'
 import { extractEmailFromEvent } from '@utils/events'
 
 describe('event', () => {
@@ -11,7 +11,7 @@ describe('event', () => {
       { body: JSON.stringify({ ...email, from: undefined }) },
       { body: JSON.stringify({ ...email, to: undefined }) },
       { body: JSON.stringify({ ...email, subject: undefined }) },
-      { body: JSON.stringify({ ...email, text: undefined, html: undefined }) },
+      { body: JSON.stringify({ ...email, html: undefined, text: undefined }) },
     ])('expect reject for bad email', (tempEvent: unknown) => {
       expect(() => extractEmailFromEvent(tempEvent as APIGatewayEvent)).toThrow()
     })
@@ -24,15 +24,15 @@ describe('event', () => {
     test('expect formatted email from event when base64', () => {
       const tempEvent = {
         ...event,
-        isBase64Encoded: true,
         body: Buffer.from(JSON.stringify(email)).toString('base64'),
+        isBase64Encoded: true,
       } as unknown as APIGatewayEvent
       const result = extractEmailFromEvent(tempEvent)
       expect(result).toEqual(email)
     })
 
     test('expect formatted email from reduced event', () => {
-      const tempEmail = { ...email, sender: undefined, replyTo: undefined, html: undefined }
+      const tempEmail = { ...email, html: undefined, replyTo: undefined, sender: undefined }
       const tempEvent = { ...event, body: JSON.stringify(tempEmail) } as unknown as APIGatewayEvent
       const result = extractEmailFromEvent(tempEvent)
       expect(result).toEqual({

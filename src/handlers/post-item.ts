@@ -1,11 +1,11 @@
 import { v1 as uuidv1 } from 'uuid'
 
-import { uploadContentsToS3 } from '../services/s3'
-import { addToQueue } from '../services/sqs'
 import { APIGatewayEvent, APIGatewayProxyResult, Email } from '../types'
-import { extractEmailFromEvent } from '../utils/events'
 import { log, logError } from '../utils/logging'
+import { addToQueue } from '../services/sqs'
+import { extractEmailFromEvent } from '../utils/events'
 import status from '../utils/status'
+import { uploadContentsToS3 } from '../services/s3'
 
 const processEmail = async (email: Email): Promise<APIGatewayProxyResult> => {
   try {

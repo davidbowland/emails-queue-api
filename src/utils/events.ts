@@ -14,17 +14,18 @@ const formatEmail = (email: Email): Email => {
   }
 
   return {
+    attachments: email.attachments,
     from: email.from,
-    sender: email.sender ?? email.from,
-    to: email.to,
-    replyTo: email.replyTo ?? email.from,
+    headers: email.headers,
+    html: email.html ?? email.text,
     inReplyTo: email.inReplyTo,
+
     references: email.references,
+    replyTo: email.replyTo ?? email.from,
+    sender: email.sender ?? email.from,
     subject: email.subject,
     text: email.text,
-    html: email.html ?? email.text,
-    headers: email.headers,
-    attachments: email.attachments,
+    to: email.to,
   }
 }
 

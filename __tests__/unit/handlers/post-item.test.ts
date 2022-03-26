@@ -1,14 +1,14 @@
-import { mocked } from 'jest-mock'
 import * as uuid from 'uuid'
+import { mocked } from 'jest-mock'
 
-import { email, uuid as expectedUuid } from '../__mocks__'
-import eventJson from '@events/post-item.json'
-import { postItem } from '@handlers/post-item'
-import * as s3 from '@services/s3'
-import * as sqs from '@services/sqs'
-import { APIGatewayEvent } from '@types'
 import * as events from '@utils/events'
 import * as logging from '@utils/logging'
+import * as s3 from '@services/s3'
+import * as sqs from '@services/sqs'
+import { email, uuid as expectedUuid } from '../__mocks__'
+import { APIGatewayEvent } from '@types'
+import eventJson from '@events/post-item.json'
+import { postItem } from '@handlers/post-item'
 import status from '@utils/status'
 
 jest.mock('uuid')

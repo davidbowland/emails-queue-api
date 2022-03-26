@@ -3,36 +3,21 @@ import { APIGatewayEvent, Email } from '@types'
 export const email: Email = {
   attachments: undefined,
   from: 'do-not-reply@bowland.link',
-  to: ['david@bowland.link'],
+  headers: {
+    From: 'do-not-reply@bowland.link',
+  },
+  html: '<p>Hello, world</p>',
   inReplyTo: undefined,
   references: [],
   replyTo: 'dave@bowland.link',
   sender: 'do-not-reply@bowland.link',
   subject: 'Hi there!',
   text: 'Hello, world',
-  html: '<p>Hello, world</p>',
-  headers: {
-    From: 'do-not-reply@bowland.link',
-  },
+  to: ['david@bowland.link'],
 }
 
 export const event: APIGatewayEvent = {
   body: JSON.stringify(email),
-  resource: '/{proxy+}',
-  path: '/path/to/resource',
-  httpMethod: 'POST',
-  queryStringParameters: {
-    foo: 'bar',
-  },
-  multiValueQueryStringParameters: {
-    foo: ['bar'],
-  },
-  pathParameters: {
-    proxy: '/path/to/resource',
-  },
-  stageVariables: {
-    baz: 'qux',
-  },
   headers: {
     Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
     'Accept-Encoding': 'gzip, deflate, sdch',
@@ -53,6 +38,7 @@ export const event: APIGatewayEvent = {
     'X-Forwarded-Port': '443',
     'X-Forwarded-Proto': 'https',
   },
+  httpMethod: 'POST',
   multiValueHeaders: {
     Accept: ['text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'],
     'Accept-Encoding': ['gzip, deflate, sdch'],
@@ -73,31 +59,51 @@ export const event: APIGatewayEvent = {
     'X-Forwarded-Port': ['443'],
     'X-Forwarded-Proto': ['https'],
   },
+  multiValueQueryStringParameters: {
+    foo: ['bar'],
+  },
+  path: '/path/to/resource',
+  pathParameters: {
+    proxy: '/path/to/resource',
+  },
+  queryStringParameters: {
+    foo: 'bar',
+  },
+
   requestContext: {
     accountId: '123456789012',
-    resourceId: '123456',
-    stage: 'prod',
+    apiId: '1234567890',
+    httpMethod: 'POST',
+    identity: {
+      accessKey: null,
+      accountId: null,
+      caller: null,
+      cognitoAuthenticationProvider: null,
+      cognitoAuthenticationType: null,
+      cognitoIdentityId: null,
+      cognitoIdentityPoolId: null,
+
+      sourceIp: '127.0.0.1',
+
+      user: null,
+
+      userAgent: 'Custom User Agent String',
+      userArn: null,
+    },
+    path: '/prod/path/to/resource',
+    protocol: 'HTTP/1.1',
+
     requestId: 'c6af9ac6-7b61-11e6-9a41-93e8deadbeef',
     requestTime: '09/Apr/2015:12:34:56 +0000',
     requestTimeEpoch: 1428582896000,
-    identity: {
-      cognitoIdentityPoolId: null,
-      accountId: null,
-      cognitoIdentityId: null,
-      caller: null,
-      accessKey: null,
-      sourceIp: '127.0.0.1',
-      cognitoAuthenticationType: null,
-      cognitoAuthenticationProvider: null,
-      userArn: null,
-      userAgent: 'Custom User Agent String',
-      user: null,
-    },
-    path: '/prod/path/to/resource',
+
+    resourceId: '123456',
     resourcePath: '/{proxy+}',
-    httpMethod: 'POST',
-    apiId: '1234567890',
-    protocol: 'HTTP/1.1',
+    stage: 'prod',
+  },
+  resource: '/{proxy+}',
+  stageVariables: {
+    baz: 'qux',
   },
 } as unknown as APIGatewayEvent
 
