@@ -6,6 +6,25 @@
   "engines": {
     "node": "^14.0.0"
   },
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davidbowland/emails-queue-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/davidbowland/emails-queue-api/issues"
+  },
+  "homepage": "https://github.com/davidbowland/emails-queue-api#readme",
+  "scripts": {
+    "build": "npm run clean && tsc && cp package*.json dist/ && cd dist/ && HUSKY=0 NODE_ENV=production npm ci",
+    "clean": "rm -rf dist coverage && NODE_ENV=test npm ci",
+    "deploy": "npm run build && ./scripts/deploy.sh",
+    "lint": "prettier --write . && eslint --fix . --resolve-plugins-relative-to .",
+    "prepare": "if [ \"$NODE_ENV\" != \"production\" ]; then husky install ; fi",
+    "start": "npm run build && npm run quick-start",
+    "quick-start": "tsc && ./scripts/runLocal.sh",
+    "test": "npm run lint && jest --colors"
+  },
   "dependencies": {
     "aws-sdk": "^2.799.0",
     "fast-json-patch": "^3.1.0",
@@ -30,16 +49,6 @@
     "prettier": "^2.5.1",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.4"
-  },
-  "scripts": {
-    "build": "npm run clean && tsc && cp package*.json dist/ && cd dist/ && HUSKY=0 NODE_ENV=production npm ci",
-    "clean": "rm -rf dist coverage && NODE_ENV=test npm ci",
-    "deploy": "npm run build && ./scripts/deploy.sh",
-    "lint": "prettier --write . && eslint --fix . --resolve-plugins-relative-to .",
-    "prepare": "if [ \"$HUSKY\" != \"0\" ]; then husky install ; fi",
-    "start": "npm run build && npm run quick-start",
-    "quick-start": "tsc && HUSKY=0 sam build && EMAIL_BUCKET=emails-service-storage-test EMAIL_REGION=us-east-1 SQS_MESSAGE_QUEUE_ID=emails SQS_QUEUE_URL=https://sqs.us-east-1.amazonaws.com/$AWS_ACCOUNT_ID/emails-queue-service-test-SimpleQueue-1RVBFSJJJDFXF.fifo sam local start-api --region us-east-1",
-    "test": "npm run lint && jest --colors"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
