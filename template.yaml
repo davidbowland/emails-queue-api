@@ -93,6 +93,10 @@ Resources:
             Method: post
             Auth:
               ApiKeyRequired: true
+      Tags:
+        'created-by': 'emails-queue-api'
+        'created-for': 'emails'
+        'environment': !Ref Environment
 
   LambdaLogGroup:
     Type: AWS::Logs::LogGroup
@@ -100,6 +104,13 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${PostItemFunction}
       RetentionInDays: 30
+      Tags:
+        - Key: 'created-by'
+          Value: 'emails-queue-api'
+        - Key: 'created-for'
+          Value: 'emails'
+        - Key: 'environment'
+          Value: !Ref Environment
 
   LambdaLogGroupSubscription:
     Type: AWS::Logs::SubscriptionFilter
