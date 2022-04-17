@@ -1,3 +1,7 @@
+// General
+
+export const environment = process.env.ENVIRONMENT as string
+
 // S3
 
 export const emailBucket = process.env.EMAIL_BUCKET as string

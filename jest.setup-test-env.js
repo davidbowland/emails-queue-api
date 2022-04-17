@@ -1,3 +1,7 @@
+// General
+
+process.env.ENVIRONMENT = 'test'
+
 // S3
 
 process.env.EMAIL_BUCKET = 'email-bucket'

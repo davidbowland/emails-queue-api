@@ -30,6 +30,7 @@ describe('S3', () => {
     const metadata = {
       'Content-Type': 'text/plain',
     }
+    const tagging = 'Environment=test'
     const valueToPut = 'Hello, world!'
 
     test('expect key and data passed to S3 as object', async () => {
@@ -39,12 +40,19 @@ describe('S3', () => {
         Bucket: emailBucket,
         Key: key,
         Metadata: metadata,
+        Tagging: tagging,
       })
     })
 
     test('expect no metadata passed to S3 when omitted', async () => {
       await putS3Object(key, valueToPut)
-      expect(mockPutObject).toHaveBeenCalledWith({ Body: valueToPut, Bucket: emailBucket, Key: key, Metadata: {} })
+      expect(mockPutObject).toHaveBeenCalledWith({
+        Body: valueToPut,
+        Bucket: emailBucket,
+        Key: key,
+        Metadata: {},
+        Tagging: tagging,
+      })
     })
 
     test('expect reject when promise rejects', async () => {
