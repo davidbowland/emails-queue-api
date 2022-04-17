@@ -80,6 +80,7 @@ Resources:
         Variables:
           EMAIL_BUCKET: !FindInMap [EnvironmentMap, !Ref Environment, bucket]
           EMAIL_REGION: us-east-1
+          ENVIRONMENT: !Ref Environment
           SQS_MESSAGE_QUEUE_ID: emails
           SQS_QUEUE_URL: !Sub
             - 'https://sqs.us-east-1.amazonaws.com/${AWS::AccountId}/${Queue}'

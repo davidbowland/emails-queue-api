@@ -1,7 +1,7 @@
 import { S3 } from 'aws-sdk'
 
+import { emailBucket, environment } from '../config'
 import { StringObject } from '../types'
-import { emailBucket } from '../config'
 
 const s3 = new S3({ apiVersion: '2006-03-01' })
 
@@ -10,7 +10,9 @@ export const putS3Object = (
   body: Buffer | string,
   metadata: StringObject = {}
 ): Promise<S3.PutObjectOutput> =>
-  s3.putObject({ Body: body, Bucket: emailBucket, Key: key, Metadata: metadata }).promise()
+  s3
+    .putObject({ Body: body, Bucket: emailBucket, Key: key, Metadata: metadata, Tagging: `Environment=${environment}` })
+    .promise()
 
 export const uploadContentsToS3 = (uuid: string, body: Buffer | string): Promise<S3.PutObjectOutput> =>
   exports.putS3Object(`queue/${uuid}`, body)
