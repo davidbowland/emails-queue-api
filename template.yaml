@@ -73,6 +73,14 @@ Resources:
         # Grant access to S3 bucket
         - S3WritePolicy:
             BucketName: !FindInMap [EnvironmentMap, !Ref Environment, bucket]
+        # Access to tag objects in S3
+        - Version: 2012-10-17
+          Statement:
+            - Action: 's3:PutObjectTagging'
+              Effect: Allow
+              Resource: !Sub
+                - 'arn:aws:s3:::${BucketName}/*'
+                - BucketName: !FindInMap [EnvironmentMap, !Ref Environment, bucket]
         # Grant access to SQS queue
         - SQSSendMessagePolicy:
             QueueName: !FindInMap [EnvironmentMap, !Ref Environment, queue]
