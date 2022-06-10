@@ -61,7 +61,7 @@ Resources:
     Properties:
       Handler: handlers/post-item.postItem
       CodeUri: './dist'
-      Runtime: nodejs14.x
+      Runtime: nodejs16.x
       Architectures:
         - x86_64
       MemorySize: 128
