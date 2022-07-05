@@ -2,8 +2,9 @@ import { S3 } from 'aws-sdk'
 
 import { emailBucket, environment } from '../config'
 import { StringObject } from '../types'
+import { xrayCapture } from '../utils/logging'
 
-const s3 = new S3({ apiVersion: '2006-03-01' })
+const s3 = xrayCapture(new S3({ apiVersion: '2006-03-01' }))
 
 export const putS3Object = (
   key: string,

@@ -9,6 +9,9 @@ jest.mock('aws-sdk', () => ({
     putObject: (...args) => ({ promise: () => mockPutObject(...args) }),
   })),
 }))
+jest.mock('@utils/logging', () => ({
+  xrayCapture: jest.fn().mockImplementation((x) => x),
+}))
 
 describe('S3', () => {
   const key = 'prefix/key'

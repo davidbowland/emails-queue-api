@@ -2,8 +2,9 @@ import { SQS } from 'aws-sdk'
 
 import { sqsMessageGroupId, sqsQueueUrl } from '../config'
 import { StringObject } from '../types'
+import { xrayCapture } from '../utils/logging'
 
-const sqs = new SQS({ apiVersion: '2012-11-05' })
+const sqs = xrayCapture(new SQS({ apiVersion: '2012-11-05' }))
 
 /* Message queue */
 

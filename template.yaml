@@ -65,7 +65,6 @@ Resources:
       Architectures:
         - x86_64
       MemorySize: 128
-      Timeout: 30
       Description: Adds emails to the queue to be sent.
       Policies:
         # Give Lambda basic execution Permission
@@ -106,6 +105,8 @@ Resources:
         'created-by': 'emails-queue-api'
         'created-for': 'emails'
         'environment': !Ref Environment
+      Timeout: 30
+      Tracing: Active
 
   LambdaLogGroup:
     Type: AWS::Logs::LogGroup
