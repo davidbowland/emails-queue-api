@@ -19,7 +19,6 @@ const formatEmail = (email: Email): Email => {
     headers: email.headers,
     html: email.html ?? email.text,
     inReplyTo: email.inReplyTo,
-
     references: email.references,
     replyTo: email.replyTo ?? email.from,
     sender: email.sender ?? email.from,
