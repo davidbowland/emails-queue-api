@@ -12,7 +12,7 @@ const processEmail = async (email: Email): Promise<APIGatewayProxyResult> => {
     const uuid = uuidv1()
     await uploadContentsToS3(uuid, JSON.stringify(email))
     await addToQueue({ uuid })
-    return status.NO_CONTENT
+    return { ...status.CREATED, body: JSON.stringify({ messageId: uuid }) }
   } catch (error) {
     logError(error)
     return status.INTERNAL_SERVER_ERROR

@@ -63,9 +63,10 @@ describe('post-item', () => {
       expect(result).toEqual(expect.objectContaining(status.INTERNAL_SERVER_ERROR))
     })
 
-    test('expect NO_CONTENT when success', async () => {
+    test('expect CREATED and UUID when success', async () => {
       const result = await postItem(event)
-      expect(result).toEqual(expect.objectContaining(status.NO_CONTENT))
+      expect(result).toEqual(expect.objectContaining(status.CREATED))
+      expect(JSON.parse(result.body).messageId).toBeDefined()
     })
   })
 })
