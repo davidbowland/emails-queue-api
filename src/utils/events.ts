@@ -15,6 +15,8 @@ const formatEmail = (email: Email): Email => {
 
   return {
     attachments: email.attachments,
+    bcc: email.bcc,
+    cc: email.cc,
     from: email.from,
     headers: email.headers,
     html: email.html ?? email.text,

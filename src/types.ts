@@ -21,6 +21,8 @@ export interface AttachmentCommon {
 
 export interface Email {
   attachments?: AttachmentCommon[]
+  bcc?: string[]
+  cc?: string[]
   from: string
   headers?: StringObject
   html: string

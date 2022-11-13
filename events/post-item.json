@@ -1,4 +1,4 @@
 {
   "httpMethod": "POST",
-  "body": "{\"from\":\"do-not-reply@bowland.link\",\"sender\":\"do-not-reply@bowland.link\",\"to\":[\"david@bowland.link\"],\"replyTo\":\"dave@bowland.link\",\"references\":[],\"subject\":\"Hi there!\",\"text\":\"Hello, world\",\"html\":\"<p>Hello, world</p>\",\"headers\":{\"From\":\"do-not-reply@bowland.link\"}}"
+  "body": "{\"bcc\":[\"bcc@domain.com\"],\"cc\":[\"cc@domain.com\"],\"from\":\"do-not-reply@domain.com\",\"sender\":\"do-not-reply@domain.com\",\"to\":[\"david@domain.com\"],\"replyTo\":\"dave@domain.com\",\"references\":[],\"subject\":\"Hi there!\",\"text\":\"Hello, world\",\"html\":\"<p>Hello, world</p>\",\"headers\":{\"From\":\"do-not-reply@domain.com\"}}"
 }

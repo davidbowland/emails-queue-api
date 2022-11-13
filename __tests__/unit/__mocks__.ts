@@ -2,18 +2,20 @@ import { APIGatewayEvent, Email } from '@types'
 
 export const email: Email = {
   attachments: undefined,
-  from: 'do-not-reply@bowland.link',
+  bcc: ['bcc@domain.com'],
+  cc: ['cc@domain.com'],
+  from: 'do-not-reply@domain.com',
   headers: {
-    From: 'do-not-reply@bowland.link',
+    From: 'do-not-reply@domain.com',
   },
   html: '<p>Hello, world</p>',
   inReplyTo: undefined,
   references: [],
-  replyTo: 'dave@bowland.link',
-  sender: 'do-not-reply@bowland.link',
+  replyTo: 'dave@domain.com',
+  sender: 'do-not-reply@domain.com',
   subject: 'Hi there!',
   text: 'Hello, world',
-  to: ['david@bowland.link'],
+  to: ['david@domain.com'],
 }
 
 export const event: APIGatewayEvent = {

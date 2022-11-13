@@ -37,18 +37,20 @@ describe('event', () => {
       const result = extractEmailFromEvent(tempEvent)
       expect(result).toEqual({
         attachments: undefined,
-        from: 'do-not-reply@bowland.link',
+        bcc: ['bcc@domain.com'],
+        cc: ['cc@domain.com'],
+        from: 'do-not-reply@domain.com',
         headers: {
-          From: 'do-not-reply@bowland.link',
+          From: 'do-not-reply@domain.com',
         },
         html: 'Hello, world',
         inReplyTo: undefined,
         references: [],
-        replyTo: 'do-not-reply@bowland.link',
-        sender: 'do-not-reply@bowland.link',
+        replyTo: 'do-not-reply@domain.com',
+        sender: 'do-not-reply@domain.com',
         subject: 'Hi there!',
         text: 'Hello, world',
-        to: ['david@bowland.link'],
+        to: ['david@domain.com'],
       })
     })
   })
