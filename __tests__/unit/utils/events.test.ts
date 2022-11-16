@@ -8,11 +8,14 @@ describe('event', () => {
 
   describe('extractEmailFromEvent', () => {
     test.each([
+      { body: JSON.stringify({ ...email, bcc: [], cc: [], to: [] }) },
+      { body: JSON.stringify({ ...email, bcc: undefined, cc: undefined, to: undefined }) },
+      { body: JSON.stringify({ ...email, bcc: 'fnord' }) },
+      { body: JSON.stringify({ ...email, cc: 'fnord' }) },
       { body: JSON.stringify({ ...email, from: undefined }) },
-      { body: JSON.stringify({ ...email, to: undefined }) },
+      { body: JSON.stringify({ ...email, to: 'fnord' }) },
       { body: JSON.stringify({ ...email, subject: undefined }) },
-      { body: JSON.stringify({ ...email, html: undefined, text: undefined }) },
-    ])('expect reject for bad email', (tempEvent: unknown) => {
+    ])('expect reject for bad email %s', (tempEvent: unknown) => {
       expect(() => extractEmailFromEvent(tempEvent as APIGatewayEvent)).toThrow()
     })
 

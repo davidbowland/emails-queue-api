@@ -5,12 +5,16 @@ import { APIGatewayEvent, Email } from '../types'
 const formatEmail = (email: Email): Email => {
   if (!email.from) {
     throw new Error('Missing from address value')
-  } else if (!email.to?.length || !email.to[0]) {
-    throw new Error('Missing to address array values')
+  } else if (email.to && !Array.isArray(email.to)) {
+    throw new Error('to must be an array of addresses, when present')
+  } else if (email.cc && !Array.isArray(email.cc)) {
+    throw new Error('cc must be an array of addresses, when present')
+  } else if (email.bcc && !Array.isArray(email.bcc)) {
+    throw new Error('bcc must be an array of addresses, when present')
+  } else if ((email.to?.length ?? 0) + (email.cc?.length ?? 0) + (email.bcc?.length ?? 0) === 0) {
+    throw new Error('One of to, cc, or bcc must be an array of addresses')
   } else if (!email.subject) {
     throw new Error('Missing subject value')
-  } else if (!email.text && !email.html) {
-    throw new Error('Either text or html must be supplied')
   }
 
   return {
