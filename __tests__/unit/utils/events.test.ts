@@ -21,6 +21,7 @@ describe('event', () => {
 
     test('expect formatted email from event', () => {
       const result = extractEmailFromEvent(event)
+
       expect(result).toEqual(email)
     })
 
@@ -31,6 +32,7 @@ describe('event', () => {
         isBase64Encoded: true,
       } as unknown as APIGatewayEvent
       const result = extractEmailFromEvent(tempEvent)
+
       expect(result).toEqual(email)
     })
 
@@ -38,6 +40,7 @@ describe('event', () => {
       const tempEmail = { ...email, html: undefined, replyTo: undefined, sender: undefined }
       const tempEvent = { ...event, body: JSON.stringify(tempEmail) } as unknown as APIGatewayEvent
       const result = extractEmailFromEvent(tempEvent)
+
       expect(result).toEqual({
         attachments: undefined,
         bcc: ['bcc@domain.com'],

@@ -3,10 +3,11 @@ import { uuid } from '../__mocks__'
 import { addToQueue } from '@services/sqs'
 import { sqsQueueUrl } from '@config'
 
-const mockSendMessage = jest.fn()
-jest.mock('aws-sdk', () => ({
-  SQS: jest.fn(() => ({
-    sendMessage: (...args) => ({ promise: () => mockSendMessage(...args) }),
+const mockSend = jest.fn()
+jest.mock('@aws-sdk/client-sqs', () => ({
+  SendMessageCommand: jest.fn().mockImplementation((x) => x),
+  SQSClient: jest.fn(() => ({
+    send: (...args) => mockSend(...args),
   })),
 }))
 jest.mock('@utils/logging', () => ({
@@ -16,13 +17,14 @@ jest.mock('@utils/logging', () => ({
 describe('sqs', () => {
   describe('addToQueue', () => {
     beforeAll(() => {
-      mockSendMessage.mockResolvedValue(undefined)
+      mockSend.mockResolvedValue(undefined)
     })
 
     test('expect email to be added to queue', async () => {
       const body = { uuid }
       await addToQueue(body)
-      expect(mockSendMessage).toHaveBeenCalledWith({
+
+      expect(mockSend).toHaveBeenCalledWith({
         MessageBody: JSON.stringify(body),
         MessageDeduplicationId: uuid,
         MessageGroupId: 'message-queue-id',

@@ -3,10 +3,11 @@ import { messageBuffer, uuid } from '../__mocks__'
 import { putS3Object, uploadContentsToS3 } from '@services/s3'
 import { emailBucket } from '@config'
 
-const mockPutObject = jest.fn()
-jest.mock('aws-sdk', () => ({
-  S3: jest.fn(() => ({
-    putObject: (...args) => ({ promise: () => mockPutObject(...args) }),
+const mockSend = jest.fn()
+jest.mock('@aws-sdk/client-s3', () => ({
+  PutObjectCommand: jest.fn().mockImplementation((x) => x),
+  S3Client: jest.fn(() => ({
+    send: (...args) => mockSend(...args),
   })),
 }))
 jest.mock('@utils/logging', () => ({
@@ -25,6 +26,7 @@ describe('S3', () => {
 
     test('expect uuid and body to be passed to putS3Object', async () => {
       await uploadContentsToS3(uuid, messageBuffer)
+
       expect(mockPutS3Object).toHaveBeenCalledWith(`queue/${uuid}`, messageBuffer)
     })
   })
@@ -38,7 +40,8 @@ describe('S3', () => {
 
     test('expect key and data passed to S3 as object', async () => {
       await putS3Object(key, valueToPut, metadata)
-      expect(mockPutObject).toHaveBeenCalledWith({
+
+      expect(mockSend).toHaveBeenCalledWith({
         Body: valueToPut,
         Bucket: emailBucket,
         Key: key,
@@ -49,7 +52,8 @@ describe('S3', () => {
 
     test('expect no metadata passed to S3 when omitted', async () => {
       await putS3Object(key, valueToPut)
-      expect(mockPutObject).toHaveBeenCalledWith({
+
+      expect(mockSend).toHaveBeenCalledWith({
         Body: valueToPut,
         Bucket: emailBucket,
         Key: key,
@@ -60,7 +64,8 @@ describe('S3', () => {
 
     test('expect reject when promise rejects', async () => {
       const rejectReason = 'unable to foo the bar'
-      mockPutObject.mockRejectedValueOnce(rejectReason)
+      mockSend.mockRejectedValueOnce(rejectReason)
+
       await expect(putS3Object(key, valueToPut, metadata)).rejects.toEqual(rejectReason)
     })
   })

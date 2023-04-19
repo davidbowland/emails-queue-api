@@ -30,6 +30,7 @@ describe('post-item', () => {
   describe('postItem', () => {
     test('expect event object logged without body', async () => {
       await postItem(event)
+
       expect(mocked(logging).log).toHaveBeenCalledWith(expect.anything(), { ...event, body: undefined })
     })
 
@@ -38,33 +39,39 @@ describe('post-item', () => {
         throw new Error('Bad request')
       })
       const result = await postItem(event)
+
       expect(result).toEqual(status.BAD_REQUEST)
     })
 
     test('expect contents uploaded to S3', async () => {
       await postItem(event)
+
       expect(mocked(s3).uploadContentsToS3).toHaveBeenCalledWith(expectedUuid, JSON.stringify(email))
     })
 
     test('expect INTERNAL_SERVER_ERROR when upload error', async () => {
       mocked(s3).uploadContentsToS3.mockRejectedValueOnce(undefined)
       const result = await postItem(event)
+
       expect(result).toEqual(expect.objectContaining(status.INTERNAL_SERVER_ERROR))
     })
 
     test('expect uuid added to queue', async () => {
       await postItem(event)
+
       expect(mocked(sqs).addToQueue).toHaveBeenCalledWith({ uuid: expectedUuid })
     })
 
     test('expect INTERNAL_SERVER_ERROR when queue error', async () => {
       mocked(sqs).addToQueue.mockRejectedValueOnce(undefined)
       const result = await postItem(event)
+
       expect(result).toEqual(expect.objectContaining(status.INTERNAL_SERVER_ERROR))
     })
 
     test('expect CREATED and UUID when success', async () => {
       const result = await postItem(event)
+
       expect(result).toEqual(expect.objectContaining(status.CREATED))
       expect(JSON.parse(result.body).messageId).toBeDefined()
     })
