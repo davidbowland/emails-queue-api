@@ -6,7 +6,7 @@ import { xrayCapture } from '../utils/logging'
 
 const s3 = xrayCapture(new S3Client({ apiVersion: '2006-03-01' }))
 
-export const putS3Object = async (
+const putS3Object = async (
   key: string,
   body: Buffer | string,
   metadata: StringObject = {}
@@ -22,4 +22,4 @@ export const putS3Object = async (
 }
 
 export const uploadContentsToS3 = (uuid: string, body: Buffer | string): Promise<PutObjectOutput> =>
-  exports.putS3Object(`queue/${uuid}`, body)
+  putS3Object(`queue/${uuid}`, body)
