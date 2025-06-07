@@ -19,7 +19,7 @@ describe('S3', () => {
   describe('uploadContentsToS3', () => {
     const tagging = 'Environment=test'
 
-    test('expect key and data passed to S3 as object', async () => {
+    it('should pass key and data to S3 as object', async () => {
       await uploadContentsToS3(uuid, messageBuffer)
 
       expect(mockSend).toHaveBeenCalledWith({
@@ -31,7 +31,7 @@ describe('S3', () => {
       })
     })
 
-    test('expect reject when promise rejects', async () => {
+    it('should reject when promise rejects', async () => {
       const rejectReason = 'unable to foo the bar'
       mockSend.mockRejectedValueOnce(rejectReason)
 

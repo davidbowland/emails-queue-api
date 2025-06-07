@@ -1,14 +1,14 @@
-import * as uuid from 'uuid'
 import { mocked } from 'jest-mock'
+import * as uuid from 'uuid'
 
-import * as events from '@utils/events'
-import * as logging from '@utils/logging'
-import * as s3 from '@services/s3'
-import * as sqs from '@services/sqs'
 import { email, uuid as expectedUuid } from '../__mocks__'
-import { APIGatewayEvent } from '@types'
 import eventJson from '@events/post-item.json'
 import { postItem } from '@handlers/post-item'
+import * as s3 from '@services/s3'
+import * as sqs from '@services/sqs'
+import { APIGatewayEvent } from '@types'
+import * as events from '@utils/events'
+import * as logging from '@utils/logging'
 import status from '@utils/status'
 
 jest.mock('uuid')
@@ -28,13 +28,13 @@ describe('post-item', () => {
   })
 
   describe('postItem', () => {
-    test('expect event object logged without body', async () => {
+    it('should log event object without body', async () => {
       await postItem(event)
 
       expect(mocked(logging).log).toHaveBeenCalledWith(expect.anything(), { ...event, body: undefined })
     })
 
-    test('expect BAD_REQUEST when extractEmailFromEvent throws', async () => {
+    it('should return BAD_REQUEST when extractEmailFromEvent throws', async () => {
       mocked(events).extractEmailFromEvent.mockImplementationOnce(() => {
         throw new Error('Bad request')
       })
@@ -43,33 +43,33 @@ describe('post-item', () => {
       expect(result).toEqual(status.BAD_REQUEST)
     })
 
-    test('expect contents uploaded to S3', async () => {
+    it('should upload contents to S3', async () => {
       await postItem(event)
 
       expect(mocked(s3).uploadContentsToS3).toHaveBeenCalledWith(expectedUuid, JSON.stringify(email))
     })
 
-    test('expect INTERNAL_SERVER_ERROR when upload error', async () => {
+    it('should return INTERNAL_SERVER_ERROR when upload fails', async () => {
       mocked(s3).uploadContentsToS3.mockRejectedValueOnce(undefined)
       const result = await postItem(event)
 
       expect(result).toEqual(expect.objectContaining(status.INTERNAL_SERVER_ERROR))
     })
 
-    test('expect uuid added to queue', async () => {
+    it('should add uuid to queue', async () => {
       await postItem(event)
 
       expect(mocked(sqs).addToQueue).toHaveBeenCalledWith({ uuid: expectedUuid })
     })
 
-    test('expect INTERNAL_SERVER_ERROR when queue error', async () => {
+    it('should return INTERNAL_SERVER_ERROR when queue operation fails', async () => {
       mocked(sqs).addToQueue.mockRejectedValueOnce(undefined)
       const result = await postItem(event)
 
       expect(result).toEqual(expect.objectContaining(status.INTERNAL_SERVER_ERROR))
     })
 
-    test('expect CREATED and UUID when success', async () => {
+    it('should return CREATED status and UUID on success', async () => {
       const result = await postItem(event)
 
       expect(result).toEqual(expect.objectContaining(status.CREATED))

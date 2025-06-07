@@ -9,7 +9,7 @@ const s3 = xrayCapture(new S3Client({ apiVersion: '2006-03-01' }))
 const putS3Object = async (
   key: string,
   body: Buffer | string,
-  metadata: StringObject = {}
+  metadata: StringObject = {},
 ): Promise<PutObjectOutput> => {
   const command = new PutObjectCommand({
     Body: body,

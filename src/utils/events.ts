@@ -38,7 +38,7 @@ const formatEmail = (email: Email): Email => {
 
 const parseEventBody = (event: APIGatewayEvent): Email =>
   JSON.parse(
-    event.isBase64Encoded && event.body ? Buffer.from(event.body, 'base64').toString('utf8') : (event.body as string)
+    event.isBase64Encoded && event.body ? Buffer.from(event.body, 'base64').toString('utf8') : (event.body as string),
   )
 
 export const extractEmailFromEvent = (event: APIGatewayEvent): Email => formatEmail(parseEventBody(event))

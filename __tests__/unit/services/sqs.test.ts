@@ -1,7 +1,6 @@
 import { uuid } from '../__mocks__'
-
-import { addToQueue } from '@services/sqs'
 import { sqsQueueUrl } from '@config'
+import { addToQueue } from '@services/sqs'
 
 const mockSend = jest.fn()
 jest.mock('@aws-sdk/client-sqs', () => ({
@@ -20,7 +19,7 @@ describe('sqs', () => {
       mockSend.mockResolvedValue(undefined)
     })
 
-    test('expect email to be added to queue', async () => {
+    it('should add email to queue', async () => {
       const body = { uuid }
       await addToQueue(body)
 
