@@ -24,7 +24,7 @@ export const postItem = async (event: APIGatewayEvent): Promise<APIGatewayProxyR
   try {
     const email = extractEmailFromEvent(event)
     return await processEmail(email)
-  } catch (error: any) {
-    return { ...status.BAD_REQUEST, body: JSON.stringify({ message: error.message }) }
+  } catch (error: unknown) {
+    return { ...status.BAD_REQUEST, body: JSON.stringify({ message: (error as Error).message }) }
   }
 }
