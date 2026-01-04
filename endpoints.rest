@@ -1,0 +1,38 @@
+# RFC 9112
+
+### Send email
+
+POST https://emails-queue-api.dbowland.com/v1/emails HTTP/1.1
+Content-Type: application/json
+x-api-key: {{apiKey}}
+
+{
+  "from": "do-not-reply@domain.com",
+  "to": ["recipient@domain.com"],
+  "cc": ["cc@domain.com"],
+  "bcc": ["bcc@domain.com"],
+  "replyTo": "reply@domain.com",
+  "sender": "do-not-reply@domain.com",
+  "subject": "Test Email Subject",
+  "text": "This is the plain text version of the email.",
+  "html": "<p>This is the <strong>HTML</strong> version of the email.</p>",
+  "headers": {
+    "From": "do-not-reply@domain.com"
+  },
+  "references": [],
+  "inReplyTo": "previous-message-id@domain.com"
+}
+
+### Send bounce
+
+POST https://emails-queue-api.dbowland.com/v1/bounces HTTP/1.1
+Content-Type: application/json
+x-api-key: {{apiKey}}
+
+{
+  "recipients": ["failed-recipient@domain.com"],
+  "bounceSender": "bounce@domain.com",
+  "bounceType": "DoesNotExist",
+  "action": "failed",
+  "status": "5.1.1"
+}

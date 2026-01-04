@@ -1,4 +1,7 @@
 {
   "httpMethod": "POST",
+  "pathParameters": {
+    "messageId": "test-message-id-123"
+  },
   "body": "{\"recipients\":[\"failed-recipient@domain.com\"],\"bounceSender\":\"bounce@domain.com\",\"bounceType\":\"DoesNotExist\",\"action\":\"failed\",\"status\":\"5.1.1\"}"
 }

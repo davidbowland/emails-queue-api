@@ -106,7 +106,7 @@ Resources:
         'created-by': 'emails-queue-api'
         'created-for': 'emails'
         'environment': !Ref Environment
-      Timeout: 30
+      Timeout: 15
       Tracing: Active
     Metadata:
       BuildMethod: esbuild
@@ -181,7 +181,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref Api
-            Path: /bounces
+            Path: /bounces/{messageId}
             Method: post
             Auth:
               ApiKeyRequired: true
@@ -189,7 +189,7 @@ Resources:
         'created-by': 'emails-queue-api'
         'created-for': 'emails'
         'environment': !Ref Environment
-      Timeout: 30
+      Timeout: 15
       Tracing: Active
     Metadata:
       BuildMethod: esbuild
