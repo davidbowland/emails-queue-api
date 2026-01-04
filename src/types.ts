@@ -34,3 +34,21 @@ export interface Email {
   text: string
   to: string[]
 }
+
+export interface BounceData {
+  messageId: string
+  recipients: string[]
+  bounceSender: string
+  bounceType?: BounceType
+  action?: DsnAction
+  status?: string
+}
+
+export type BounceType =
+  | 'ContentRejected'
+  | 'DoesNotExist'
+  | 'ExceededQuota'
+  | 'MessageTooLarge'
+  | 'TemporaryFailure'
+  | 'Undefined'
+export type DsnAction = 'delayed' | 'delivered' | 'expanded' | 'failed' | 'relayed'

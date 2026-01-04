@@ -1,4 +1,4 @@
-import { APIGatewayEvent, Email } from '@types'
+import { APIGatewayEvent, BounceData, Email } from '@types'
 
 export const email: Email = {
   attachments: undefined,
@@ -110,5 +110,14 @@ export const event: APIGatewayEvent = {
 } as unknown as APIGatewayEvent
 
 export const messageBuffer = Buffer.from(JSON.stringify(email))
+
+export const bounceData: BounceData = {
+  action: 'failed',
+  bounceSender: 'bounce@domain.com',
+  bounceType: 'DoesNotExist',
+  messageId: 'test-message-id-123',
+  recipients: ['failed-recipient@domain.com'],
+  status: '5.1.1',
+}
 
 export const uuid = 'aaaaa-uuuuu-uuuuu-iiiii-ddddd'
