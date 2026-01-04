@@ -19,7 +19,7 @@ const processEmail = async (email: Email): Promise<APIGatewayProxyResult> => {
   }
 }
 
-export const postItem = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
+export const postEmailHandler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
   log('Received event', { ...event, body: undefined })
   try {
     const email = extractEmailFromEvent(event)

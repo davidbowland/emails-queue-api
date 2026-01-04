@@ -22,6 +22,7 @@ Mappings:
       domain: emails-queue-api.dbowland.com
       logStreamFunction: log-subscriber
       queue: emails-queue-service-SimpleQueue-1S70UGPUYHOUI.fifo
+      queueNameSend: emails-to-send.fifo
       zoneId: Z072422417XWM8PIXXSFA
     test:
       bucket: emails-service-storage-test
@@ -29,6 +30,7 @@ Mappings:
       domain: emails-queue-api.bowland.link
       logStreamFunction: log-subscriber-test
       queue: emails-queue-service-test-SimpleQueue-1RVBFSJJJDFXF.fifo
+      queueNameSend: emails-to-send-test.fifo
       zoneId: Z01312547RGU1BYKIJXY
 
 Resources:
@@ -56,10 +58,10 @@ Resources:
 
   # Lambda
 
-  PostItemFunction:
+  PostEmailFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/post-item.postItem
+      Handler: src/handlers/post-email.postEmailHandler
       Runtime: nodejs22.x
       Architectures:
         - x86_64
@@ -81,7 +83,7 @@ Resources:
                 - BucketName: !FindInMap [EnvironmentMap, !Ref Environment, bucket]
         # Grant access to SQS queue
         - SQSSendMessagePolicy:
-            QueueName: !FindInMap [EnvironmentMap, !Ref Environment, queue]
+            QueueName: !FindInMap [EnvironmentMap, !Ref Environment, queueNameSend]
       Environment:
         Variables:
           EMAIL_BUCKET: !FindInMap [EnvironmentMap, !Ref Environment, bucket]
@@ -90,7 +92,7 @@ Resources:
           SQS_MESSAGE_QUEUE_ID: emails
           SQS_QUEUE_URL: !Sub
             - 'https://sqs.us-east-1.amazonaws.com/${AWS::AccountId}/${Queue}'
-            - Queue: !FindInMap [EnvironmentMap, !Ref Environment, queue]
+            - Queue: !FindInMap [EnvironmentMap, !Ref Environment, queueNameSend]
       Events:
         ApiKey:
           Type: Api
@@ -113,13 +115,12 @@ Resources:
         Target: 'es2020'
         Sourcemap: true
         EntryPoints:
-          - src/handlers/post-item.ts
+          - src/handlers/post-email.ts
 
-  LambdaLogGroup:
+  PostEmailLogGroup:
     Type: AWS::Logs::LogGroup
-    DependsOn: [PostItemFunction]
     Properties:
-      LogGroupName: !Sub /aws/lambda/${PostItemFunction}
+      LogGroupName: !Sub /aws/lambda/${PostEmailFunction}
       RetentionInDays: 30
       Tags:
         - Key: 'created-by'
@@ -129,11 +130,11 @@ Resources:
         - Key: 'environment'
           Value: !Ref Environment
 
-  LambdaLogGroupSubscription:
+  PostEmailLogGroupSubscription:
     Type: AWS::Logs::SubscriptionFilter
     Properties:
       DestinationArn: !Sub
         - 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Function}'
         - Function: !FindInMap [EnvironmentMap, !Ref Environment, logStreamFunction]
       FilterPattern: '[timestamp, uuid, level="ERROR", message]'
-      LogGroupName: !Ref LambdaLogGroup
+      LogGroupName: !Ref PostEmailLogGroup

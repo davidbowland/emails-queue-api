@@ -1,5 +1,5 @@
 import { email } from '../__mocks__'
-import eventJson from '@events/post-item.json'
+import eventJson from '@events/post-email.json'
 import { APIGatewayEvent } from '@types'
 import { extractEmailFromEvent } from '@utils/events'
 
