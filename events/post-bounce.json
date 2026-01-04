@@ -1,0 +1,4 @@
+{
+  "httpMethod": "POST",
+  "body": "{\"recipients\":[\"failed-recipient@domain.com\"],\"bounceSender\":\"bounce@domain.com\",\"bounceType\":\"DoesNotExist\",\"action\":\"failed\",\"status\":\"5.1.1\"}"
+}

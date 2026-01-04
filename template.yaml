@@ -21,7 +21,7 @@ Mappings:
       certificate: adce1a21-90b4-4120-8548-111215e582f0
       domain: emails-queue-api.dbowland.com
       logStreamFunction: log-subscriber
-      queue: emails-queue-service-SimpleQueue-1S70UGPUYHOUI.fifo
+      queueNameBounce: emails-to-bounce.fifo
       queueNameSend: emails-to-send.fifo
       zoneId: Z072422417XWM8PIXXSFA
     test:
@@ -29,7 +29,7 @@ Mappings:
       certificate: 6a48cba7-feb9-4de5-8cbf-d383140fcdef
       domain: emails-queue-api.bowland.link
       logStreamFunction: log-subscriber-test
-      queue: emails-queue-service-test-SimpleQueue-1RVBFSJJJDFXF.fifo
+      queueNameBounce: emails-to-bounce-test.fifo
       queueNameSend: emails-to-send-test.fifo
       zoneId: Z01312547RGU1BYKIJXY
 
@@ -56,7 +56,7 @@ Resources:
         BasePath:
           - /v1
 
-  # Lambda
+  # Send email
 
   PostEmailFunction:
     Type: AWS::Serverless::Function
@@ -65,8 +65,8 @@ Resources:
       Runtime: nodejs22.x
       Architectures:
         - x86_64
-      MemorySize: 128
-      Description: Adds emails to the queue to be sent.
+      MemorySize: 1536
+      Description: Adds emails to the queue to be sent
       Policies:
         # Give Lambda basic execution Permission
         - AWSLambdaBasicExecutionRole
@@ -138,3 +138,86 @@ Resources:
         - Function: !FindInMap [EnvironmentMap, !Ref Environment, logStreamFunction]
       FilterPattern: '[timestamp, uuid, level="ERROR", message]'
       LogGroupName: !Ref PostEmailLogGroup
+
+  # Send bounce
+
+  PostBounceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/post-bounce.postBounceHandler
+      Runtime: nodejs22.x
+      Architectures:
+        - x86_64
+      MemorySize: 1024
+      Description: Adds bounces to the queue to be sent
+      Policies:
+        # Give Lambda basic execution Permission
+        - AWSLambdaBasicExecutionRole
+        # Grant access to S3 bucket
+        - S3WritePolicy:
+            BucketName: !FindInMap [EnvironmentMap, !Ref Environment, bucket]
+        # Access to tag objects in S3
+        - Version: 2012-10-17
+          Statement:
+            - Action: 's3:PutObjectTagging'
+              Effect: Allow
+              Resource: !Sub
+                - 'arn:aws:s3:::${BucketName}/*'
+                - BucketName: !FindInMap [EnvironmentMap, !Ref Environment, bucket]
+        # Grant access to SQS queue
+        - SQSSendMessagePolicy:
+            QueueName: !FindInMap [EnvironmentMap, !Ref Environment, queueNameBounce]
+      Environment:
+        Variables:
+          EMAIL_BUCKET: !FindInMap [EnvironmentMap, !Ref Environment, bucket]
+          EMAIL_REGION: us-east-1
+          ENVIRONMENT: !Ref Environment
+          SQS_MESSAGE_QUEUE_ID: bounces
+          SQS_QUEUE_URL: !Sub
+            - 'https://sqs.us-east-1.amazonaws.com/${AWS::AccountId}/${Queue}'
+            - Queue: !FindInMap [EnvironmentMap, !Ref Environment, queueNameBounce]
+      Events:
+        ApiKey:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /bounces
+            Method: post
+            Auth:
+              ApiKeyRequired: true
+      Tags:
+        'created-by': 'emails-queue-api'
+        'created-for': 'emails'
+        'environment': !Ref Environment
+      Timeout: 30
+      Tracing: Active
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2020'
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/post-bounce.ts
+
+  PostBounceLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${PostBounceFunction}
+      RetentionInDays: 30
+      Tags:
+        - Key: 'created-by'
+          Value: 'emails-queue-api'
+        - Key: 'created-for'
+          Value: 'emails'
+        - Key: 'environment'
+          Value: !Ref Environment
+
+  PostBounceLogGroupSubscription:
+    Type: AWS::Logs::SubscriptionFilter
+    Properties:
+      DestinationArn: !Sub
+        - 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Function}'
+        - Function: !FindInMap [EnvironmentMap, !Ref Environment, logStreamFunction]
+      FilterPattern: '[timestamp, uuid, level="ERROR", message]'
+      LogGroupName: !Ref PostBounceLogGroup

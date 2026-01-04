@@ -1,4 +1,4 @@
-import { APIGatewayEvent, Email } from '../types'
+import { APIGatewayEvent, BounceData, BounceType, DsnAction, Email } from '../types'
 
 /* Email */
 
@@ -34,11 +34,50 @@ const formatEmail = (email: Email): Email => {
   }
 }
 
+/* Bounce */
+
+const VALID_BOUNCE_TYPES: BounceType[] = [
+  'ContentRejected',
+  'DoesNotExist',
+  'ExceededQuota',
+  'MessageTooLarge',
+  'TemporaryFailure',
+  'Undefined',
+]
+const VALID_DSN_ACTIONS: DsnAction[] = ['delayed', 'delivered', 'expanded', 'failed', 'relayed']
+
+const formatBounceData = (
+  bounceData: BounceData,
+  validBounceTypes: BounceType[] = VALID_BOUNCE_TYPES,
+  validDsnActions: DsnAction[] = VALID_DSN_ACTIONS,
+): BounceData => {
+  if (!bounceData.recipients || !Array.isArray(bounceData.recipients) || bounceData.recipients.length === 0) {
+    throw new Error('recipients must be a non-empty array of email addresses')
+  } else if (!bounceData.bounceSender) {
+    throw new Error('Missing bounceSender value')
+  } else if (bounceData.bounceType && !validBounceTypes.includes(bounceData.bounceType)) {
+    throw new Error(`Invalid bounceType: ${bounceData.bounceType}`)
+  } else if (bounceData.action && !validDsnActions.includes(bounceData.action)) {
+    throw new Error(`Invalid action: ${bounceData.action}`)
+  }
+
+  return {
+    action: bounceData.action,
+    bounceSender: bounceData.bounceSender,
+    bounceType: bounceData.bounceType,
+    recipients: bounceData.recipients,
+    status: bounceData.status,
+  }
+}
+
 /* Event */
 
-const parseEventBody = (event: APIGatewayEvent): Email =>
+const parseEventBody = (event: APIGatewayEvent): any =>
   JSON.parse(
     event.isBase64Encoded && event.body ? Buffer.from(event.body, 'base64').toString('utf8') : (event.body as string),
   )
 
 export const extractEmailFromEvent = (event: APIGatewayEvent): Email => formatEmail(parseEventBody(event))
+
+export const extractBounceDataFromEvent = (event: APIGatewayEvent): BounceData =>
+  formatBounceData(parseEventBody(event))

@@ -31,6 +31,20 @@ describe('S3', () => {
       })
     })
 
+    it('should use prefix when passed', async () => {
+      const newPrefix = 'new-prefix'
+      const newKey = `${newPrefix}/${uuid}`
+      await uploadContentsToS3(uuid, messageBuffer, newPrefix)
+
+      expect(mockSend).toHaveBeenCalledWith({
+        Body: messageBuffer,
+        Bucket: emailBucket,
+        Key: newKey,
+        Metadata: {},
+        Tagging: tagging,
+      })
+    })
+
     it('should reject when promise rejects', async () => {
       const rejectReason = 'unable to foo the bar'
       mockSend.mockRejectedValueOnce(rejectReason)

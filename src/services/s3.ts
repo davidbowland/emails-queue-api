@@ -21,5 +21,8 @@ const putS3Object = async (
   return s3.send(command)
 }
 
-export const uploadContentsToS3 = (uuid: string, body: Buffer | string): Promise<PutObjectOutput> =>
-  putS3Object(`queue/${uuid}`, body)
+export const uploadContentsToS3 = (
+  uuid: string,
+  body: Buffer | string,
+  prefix: string = 'queue',
+): Promise<PutObjectOutput> => putS3Object(`${prefix}/${uuid}`, body)

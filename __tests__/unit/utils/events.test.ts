@@ -1,12 +1,13 @@
-import { email } from '../__mocks__'
-import eventJson from '@events/post-email.json'
+import { bounceData, email } from '../__mocks__'
+import bounceEventJson from '@events/post-bounce.json'
+import emailEventJson from '@events/post-email.json'
 import { APIGatewayEvent } from '@types'
-import { extractEmailFromEvent } from '@utils/events'
+import { extractBounceDataFromEvent, extractEmailFromEvent } from '@utils/events'
 
 describe('event', () => {
-  const event = eventJson as unknown as APIGatewayEvent
-
   describe('extractEmailFromEvent', () => {
+    const event = emailEventJson as unknown as APIGatewayEvent
+
     it.each([
       { body: JSON.stringify({ ...email, bcc: [], cc: [], to: [] }) },
       { body: JSON.stringify({ ...email, bcc: undefined, cc: undefined, to: undefined }) },
@@ -57,6 +58,52 @@ describe('event', () => {
         subject: 'Hi there!',
         text: 'Hello, world',
         to: ['david@domain.com'],
+      })
+    })
+  })
+
+  describe('extractBounceDataFromEvent', () => {
+    const event = bounceEventJson as unknown as APIGatewayEvent
+
+    it.each([
+      { body: JSON.stringify({ ...bounceData, recipients: [] }) },
+      { body: JSON.stringify({ ...bounceData, recipients: undefined }) },
+      { body: JSON.stringify({ ...bounceData, recipients: 'fnord' }) },
+      { body: JSON.stringify({ ...bounceData, bounceSender: undefined }) },
+      { body: JSON.stringify({ ...bounceData, bounceType: 'Jackhammer' }) },
+      { body: JSON.stringify({ ...bounceData, action: 'exploded' }) },
+    ])('should reject bad bounce data %s', (tempEvent: unknown) => {
+      expect(() => extractBounceDataFromEvent(tempEvent as APIGatewayEvent)).toThrow()
+    })
+
+    it('should return formatted bounce data from event', () => {
+      const result = extractBounceDataFromEvent(event)
+
+      expect(result).toEqual(bounceData)
+    })
+
+    it('should return formatted bounce data from base64 encoded event', () => {
+      const tempEvent = {
+        ...event,
+        body: Buffer.from(JSON.stringify(bounceData)).toString('base64'),
+        isBase64Encoded: true,
+      } as unknown as APIGatewayEvent
+      const result = extractBounceDataFromEvent(tempEvent)
+
+      expect(result).toEqual(bounceData)
+    })
+
+    it('should return formatted bounce data from reduced event', () => {
+      const tempBounceData = { bounceSender: bounceData.bounceSender, recipients: bounceData.recipients }
+      const tempEvent = { ...event, body: JSON.stringify(tempBounceData) } as unknown as APIGatewayEvent
+      const result = extractBounceDataFromEvent(tempEvent)
+
+      expect(result).toEqual({
+        action: undefined,
+        bounceSender: 'bounce@domain.com',
+        bounceType: undefined,
+        recipients: ['failed-recipient@domain.com'],
+        status: undefined,
       })
     })
   })
