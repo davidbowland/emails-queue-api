@@ -1,4 +1,4 @@
-import { APIGatewayEvent, BounceData, BounceType, DsnAction, Email } from '../types'
+import { APIGatewayEvent, BounceData, BounceType, Email } from '../types'
 
 /* Email */
 
@@ -44,13 +44,8 @@ const VALID_BOUNCE_TYPES: BounceType[] = [
   'TemporaryFailure',
   'Undefined',
 ]
-const VALID_DSN_ACTIONS: DsnAction[] = ['delayed', 'delivered', 'expanded', 'failed', 'relayed']
 
-const formatBounceData = (
-  bounceData: BounceData,
-  validBounceTypes: BounceType[] = VALID_BOUNCE_TYPES,
-  validDsnActions: DsnAction[] = VALID_DSN_ACTIONS,
-): BounceData => {
+const formatBounceData = (bounceData: BounceData, validBounceTypes: BounceType[] = VALID_BOUNCE_TYPES): BounceData => {
   if (!bounceData.messageId) {
     throw new Error('Missing messageId value')
   } else if (!bounceData.recipients || !Array.isArray(bounceData.recipients) || bounceData.recipients.length === 0) {
@@ -59,17 +54,13 @@ const formatBounceData = (
     throw new Error('Missing bounceSender value')
   } else if (bounceData.bounceType && !validBounceTypes.includes(bounceData.bounceType)) {
     throw new Error(`Invalid bounceType: ${bounceData.bounceType}`)
-  } else if (bounceData.action && !validDsnActions.includes(bounceData.action)) {
-    throw new Error(`Invalid action: ${bounceData.action}`)
   }
 
   return {
-    action: bounceData.action,
     bounceSender: bounceData.bounceSender,
     bounceType: bounceData.bounceType,
     messageId: bounceData.messageId,
     recipients: bounceData.recipients,
-    status: bounceData.status,
   }
 }
 

@@ -72,7 +72,6 @@ describe('event', () => {
       { body: JSON.stringify({ ...bounceData, recipients: 'fnord' }) },
       { body: JSON.stringify({ ...bounceData, bounceSender: undefined }) },
       { body: JSON.stringify({ ...bounceData, bounceType: 'Jackhammer' }) },
-      { body: JSON.stringify({ ...bounceData, action: 'exploded' }) },
     ])('should reject bad bounce data %s', (tempEvent: unknown) => {
       expect(() => extractBounceDataFromEvent(tempEvent as APIGatewayEvent)).toThrow()
     })
@@ -104,12 +103,10 @@ describe('event', () => {
       const result = extractBounceDataFromEvent(tempEvent)
 
       expect(result).toEqual({
-        action: undefined,
         bounceSender: 'bounce@domain.com',
         bounceType: undefined,
         messageId: 'test-message-id-123',
         recipients: ['failed-recipient@domain.com'],
-        status: undefined,
       })
     })
   })

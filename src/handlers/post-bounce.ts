@@ -12,7 +12,7 @@ const processBounce = async (bounceData: BounceData): Promise<APIGatewayProxyRes
     const uuid = uuidv1()
     await uploadContentsToS3(uuid, JSON.stringify(bounceData), 'queue-bounced')
     await addToQueue({ uuid })
-    return { ...status.CREATED, body: JSON.stringify({ messageId: uuid }) }
+    return { ...status.CREATED, body: JSON.stringify({ uuid }) }
   } catch (error) {
     logError(error)
     return status.INTERNAL_SERVER_ERROR

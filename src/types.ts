@@ -40,8 +40,6 @@ export interface BounceData {
   recipients: string[]
   bounceSender: string
   bounceType?: BounceType
-  action?: DsnAction
-  status?: string
 }
 
 export type BounceType =
@@ -51,4 +49,3 @@ export type BounceType =
   | 'MessageTooLarge'
   | 'TemporaryFailure'
   | 'Undefined'
-export type DsnAction = 'delayed' | 'delivered' | 'expanded' | 'failed' | 'relayed'
