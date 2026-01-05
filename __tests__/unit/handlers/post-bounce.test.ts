@@ -78,7 +78,7 @@ describe('post-bounce', () => {
       const result = await postBounceHandler(event)
 
       expect(result).toEqual(expect.objectContaining(status.CREATED))
-      expect(JSON.parse(result.body)).toEqual({ uuid: expectedUuid })
+      expect(JSON.parse(result.body)).toEqual({ messageId: expectedUuid })
     })
   })
 })
