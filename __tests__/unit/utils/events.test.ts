@@ -66,6 +66,7 @@ describe('event', () => {
     const event = bounceEventJson as unknown as APIGatewayEvent
 
     it.each([
+      { body: JSON.stringify({ ...bounceData, messageId: undefined }) },
       { body: JSON.stringify({ ...bounceData, recipients: [] }) },
       { body: JSON.stringify({ ...bounceData, recipients: undefined }) },
       { body: JSON.stringify({ ...bounceData, recipients: 'fnord' }) },
@@ -94,7 +95,11 @@ describe('event', () => {
     })
 
     it('should return formatted bounce data from reduced event', () => {
-      const tempBounceData = { bounceSender: bounceData.bounceSender, recipients: bounceData.recipients }
+      const tempBounceData = {
+        bounceSender: bounceData.bounceSender,
+        messageId: bounceData.messageId,
+        recipients: bounceData.recipients,
+      }
       const tempEvent = { ...event, body: JSON.stringify(tempBounceData) } as unknown as APIGatewayEvent
       const result = extractBounceDataFromEvent(tempEvent)
 
@@ -102,6 +107,7 @@ describe('event', () => {
         action: undefined,
         bounceSender: 'bounce@domain.com',
         bounceType: undefined,
+        messageId: 'test-message-id-123',
         recipients: ['failed-recipient@domain.com'],
         status: undefined,
       })

@@ -51,7 +51,9 @@ const formatBounceData = (
   validBounceTypes: BounceType[] = VALID_BOUNCE_TYPES,
   validDsnActions: DsnAction[] = VALID_DSN_ACTIONS,
 ): BounceData => {
-  if (!bounceData.recipients || !Array.isArray(bounceData.recipients) || bounceData.recipients.length === 0) {
+  if (!bounceData.messageId) {
+    throw new Error('Missing messageId value')
+  } else if (!bounceData.recipients || !Array.isArray(bounceData.recipients) || bounceData.recipients.length === 0) {
     throw new Error('recipients must be a non-empty array of email addresses')
   } else if (!bounceData.bounceSender) {
     throw new Error('Missing bounceSender value')
@@ -65,6 +67,7 @@ const formatBounceData = (
     action: bounceData.action,
     bounceSender: bounceData.bounceSender,
     bounceType: bounceData.bounceType,
+    messageId: bounceData.messageId,
     recipients: bounceData.recipients,
     status: bounceData.status,
   }

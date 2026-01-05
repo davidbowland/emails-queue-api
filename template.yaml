@@ -181,7 +181,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref Api
-            Path: /bounces/{messageId}
+            Path: /bounces
             Method: post
             Auth:
               ApiKeyRequired: true

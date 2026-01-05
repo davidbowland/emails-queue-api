@@ -36,6 +36,7 @@ export interface Email {
 }
 
 export interface BounceData {
+  messageId: string
   recipients: string[]
   bounceSender: string
   bounceType?: BounceType

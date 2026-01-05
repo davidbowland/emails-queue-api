@@ -115,6 +115,7 @@ export const bounceData: BounceData = {
   action: 'failed',
   bounceSender: 'bounce@domain.com',
   bounceType: 'DoesNotExist',
+  messageId: 'test-message-id-123',
   recipients: ['failed-recipient@domain.com'],
   status: '5.1.1',
 }

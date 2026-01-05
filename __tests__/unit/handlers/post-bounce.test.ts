@@ -1,4 +1,5 @@
 import { mocked } from 'jest-mock'
+import { v1 as uuidv1 } from 'uuid'
 
 import { bounceData } from '../__mocks__'
 import eventJson from '@events/post-bounce.json'
@@ -14,15 +15,17 @@ jest.mock('@services/s3')
 jest.mock('@services/sqs')
 jest.mock('@utils/events')
 jest.mock('@utils/logging')
+jest.mock('uuid')
 
 describe('post-bounce', () => {
   const event = eventJson as unknown as APIGatewayEvent
-  const expectedMessageId = 'test-message-id-123'
+  const expectedUuid = 'test-uuid-123'
 
   beforeAll(() => {
     mocked(events).extractBounceDataFromEvent.mockReturnValue(bounceData)
     mocked(s3).uploadContentsToS3.mockResolvedValue(undefined)
     mocked(sqs).addToQueue.mockResolvedValue(undefined)
+    mocked(uuidv1).mockReturnValue(expectedUuid)
   })
 
   describe('postBounceHandler', () => {
@@ -45,7 +48,7 @@ describe('post-bounce', () => {
       await postBounceHandler(event)
 
       expect(mocked(s3).uploadContentsToS3).toHaveBeenCalledWith(
-        expectedMessageId,
+        expectedUuid,
         JSON.stringify(bounceData),
         'queue-bounced',
       )
@@ -61,7 +64,7 @@ describe('post-bounce', () => {
     it('should add uuid to queue', async () => {
       await postBounceHandler(event)
 
-      expect(mocked(sqs).addToQueue).toHaveBeenCalledWith({ uuid: expectedMessageId })
+      expect(mocked(sqs).addToQueue).toHaveBeenCalledWith({ uuid: expectedUuid })
     })
 
     it('should return INTERNAL_SERVER_ERROR when queue operation fails', async () => {
@@ -75,7 +78,7 @@ describe('post-bounce', () => {
       const result = await postBounceHandler(event)
 
       expect(result).toEqual(expect.objectContaining(status.CREATED))
-      expect(JSON.parse(result.body).messageId).toBe(expectedMessageId)
+      expect(JSON.parse(result.body).messageId).toBe(expectedUuid)
     })
   })
 })
