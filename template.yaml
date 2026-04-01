@@ -62,7 +62,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/post-email.postEmailHandler
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - x86_64
       MemorySize: 1536
@@ -145,7 +145,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/post-bounce.postBounceHandler
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - x86_64
       MemorySize: 1024
