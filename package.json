@@ -1,6 +1,7 @@
 {
   "name": "emails-queue-api",
   "author": "David Bowland",
+  "license": "SEE LICENSE IN LICENSE",
   "description": "Queues emails in SQS to be sent by emails-queue-service",
   "version": "1.44.0",
   "engines": {

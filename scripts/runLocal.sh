@@ -18,5 +18,5 @@ sam build --template ${SAM_TEMPLATE}
 export EMAIL_BUCKET=emails-service-storage-test
 export EMAIL_REGION=us-east-1
 export SQS_MESSAGE_QUEUE_ID=emails
-export SQS_QUEUE_URL=https://sqs.us-east-1.amazonaws.com/$AWS_ACCOUNT_ID/emails-queue-service-test-SimpleQueue-1RVBFSJJJDFXF.fifo
+export SQS_QUEUE_URL=https://sqs.us-east-1.amazonaws.com/$AWS_ACCOUNT_ID/emails-to-send-test.fifo
 sam local start-api --region=us-east-1 --force-image-build --parameter-overrides "Environment=test" --log-file local.log
