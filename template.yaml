@@ -130,14 +130,10 @@ Resources:
         - Key: 'environment'
           Value: !Ref Environment
 
-  PostEmailLogGroupSubscription:
-    Type: AWS::Logs::SubscriptionFilter
-    Properties:
-      DestinationArn: !Sub
-        - 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Function}'
-        - Function: !FindInMap [EnvironmentMap, !Ref Environment, logStreamFunction]
-      FilterPattern: '[timestamp, uuid, level="ERROR", message]'
-      LogGroupName: !Ref PostEmailLogGroup
+  # PostEmailLogGroup is deliberately not subscribed to log-subscriber. log-subscriber sends its
+  # alerts through POST /v1/emails, so a subscription here would make every failure of that call
+  # log an ERROR that invokes log-subscriber, which calls this endpoint again. The bounce path
+  # below is not on log-subscriber's send path and stays subscribed.
 
   # Send bounce
 
