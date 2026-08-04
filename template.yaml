@@ -55,6 +55,15 @@ Resources:
           HostedZoneId: !FindInMap [EnvironmentMap, !Ref Environment, zoneId]
         BasePath:
           - /v1
+      # Without this the gateway makes no sampling decision and passes no tracing header on invoke,
+      # so these Lambdas root a NEW trace instead of continuing the caller's — and the callers that
+      # bother to send X-Amzn-Trace-Id (bridge-api's tracedFetch, emails-inbound-service's captured
+      # https) get a header that lands in event.headers and is read by nobody. This stage is only
+      # two endpoints, both low volume, so the gateway segments it mints are cheap. Do NOT copy this
+      # to emails-email-api: that stage fronts 22 endpoints, most of them the UI's, and tracing it
+      # would undo the per-function split there. See playhouse
+      # docs/superpowers/specs/2026-08-03-xray-removal-design.md.
+      TracingEnabled: true
 
   # Send email
 
